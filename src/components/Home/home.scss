@@ -1,0 +1,77 @@
+@import "../styles/styles.scss";
+
+.home {
+    display: flex;
+    flex-direction: column;
+    background-color: $primary;
+
+    &__title {
+        color: $text;
+        font-size: 5em;
+        font-weight: 400;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        white-space: nowrap;
+        margin-top: 1em;
+    }
+
+    &__background {
+        width: 80%;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    &__description {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: row;
+        clip-path: polygon(81% 5%, 100% 20%, 100% 100%, 0 100%, 0% 20%);
+
+        &__el {
+            flex: 1 1 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            opacity: 0.8;
+            padding: 0 1em;
+
+            &:hover {
+                transition: 0.5s all;
+                opacity: 1;
+            }
+
+            &__icon {
+                font-size: 2em;
+                border-bottom: 1px solid white;
+                padding: 0.3em 2em;
+                margin-bottom: 1em;
+            }
+
+            &__text {
+                font-size: 1.5em;
+            }
+
+            &.a{
+                background-color: #0A3649;
+            }
+
+            &.b{
+                background-color: #AFA32A;
+            }
+
+            &.c{
+                background-color: #2E96B7;
+            }
+
+            &.d{
+                background-color: #3E030E;
+            }
+        }
+    }
+}

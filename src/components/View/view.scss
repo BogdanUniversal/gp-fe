@@ -1,0 +1,218 @@
+@import "../styles/styles.scss";
+
+.view {
+  // overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  // justify-content: center;
+  align-items: center;
+  width: 100%;
+  position: relative;
+
+  &__documentation {
+    font-family: "Inconsolata", monospace;
+    padding: 0 1em 1em 1em;
+    width: 500px;
+    height: 200px;
+    background-color: #2B2B2B;
+    overflow-y: scroll;
+    border: 2px solid grey;
+    position: absolute;
+    display: none;
+    z-index: 999;
+
+    &__syntax {
+      // font-size: 3em;
+    }
+
+    &::-webkit-scrollbar-track {
+      border-radius: 10px;
+      -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+      background-color: #333333;
+    }
+
+    &::-webkit-scrollbar {
+      border-radius: 10px;
+      width: 15px;
+      background-color: #4a4a4a;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      background-color: #4a4a4a;
+    }
+
+    &.active {
+      display: block;
+    }
+  }
+
+  &__options {
+    margin-top: 1em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1em;
+    background-color: whitesmoke;
+    width: 60%;
+    border-radius: 10px;
+    padding: 1em;
+    margin-bottom: 1em;
+    font-size: 1.5em;
+
+    &__select {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      &__box {
+        margin-left: 1em;
+        width: 10em;
+      }
+    }
+  }
+
+  &__code {
+    // width: 70%;
+    // overflow-y: scroll;
+    // flex-grow: 1;
+    height: 75vh;
+    width: 60vw;
+
+    &__syntax {
+      border-radius: 10px;
+      height: 100%;
+      width: 100%;
+
+      &::-webkit-scrollbar-track {
+        border-radius: 10px;
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        background-color: #333333;
+      }
+
+      &::-webkit-scrollbar {
+        border-radius: 10px;
+        width: 15px;
+        background-color: #4a4a4a;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        background-color: #4a4a4a;
+      }
+    }
+  }
+
+  &__tree {
+    position: relative;
+    --grid-size: 30px;
+    --grid-strength: 1px;
+    --grid-dash: 10px;
+    --grid-gap: 5px;
+    --grid-color: #ddd;
+    --paper-color: #fff;
+    border-radius: 10px;
+    width: 90%;
+    height: 80%;
+
+    &__options {
+      position: absolute;
+      top: 1em;
+      right: 2em;
+      display: flex;
+      flex-direction: row;
+      gap: 1em;
+
+      &__icon {
+        border: 1px solid grey;
+        padding: 0.3em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        &.first {
+          margin-left: auto;
+        }
+        &__svg {
+          font-size: 2em;
+        }
+
+        &:hover {
+          transition: 0.3s all;
+          background-color: darkgray;
+          cursor: pointer;
+        }
+
+        &.active {
+          background-color: darkgray;
+        }
+      }
+    }
+
+    background-color: var(--paper-color);
+    background-size: var(--grid-dash) var(--grid-dash),
+      var(--grid-size) var(--grid-size);
+    background-image: linear-gradient(
+        to bottom,
+        transparent var(--grid-gap),
+        var(--paper-color) var(--grid-gap)
+      ),
+      linear-gradient(
+        to right,
+        var(--grid-color) var(--grid-strength),
+        transparent var(--grid-strength)
+      ),
+      linear-gradient(
+        to right,
+        transparent var(--grid-gap),
+        var(--paper-color) var(--grid-gap)
+      ),
+      linear-gradient(
+        to bottom,
+        var(--grid-color) var(--grid-strength),
+        transparent var(--grid-strength)
+      );
+
+    &__group {
+      user-select: none;
+      position: relative;
+
+      &__container {
+        position: relative;
+      }
+
+      &__circle1 {
+        fill: none;
+        display: none;
+        opacity: 0.5;
+        fill: rgb(200, 200, 200);
+
+        &.active {
+          display: block;
+        }
+      }
+
+      &__circle2 {
+        // position: absolute;
+      }
+
+      &__text {
+        position: absolute;
+        transform: translateX(1%);
+      }
+    }
+
+    &__node {
+      &__root {
+      }
+
+      &__branch {
+        & > circle {
+          fill: burlywood;
+        }
+      }
+
+      &__leaf {
+        fill: white;
+      }
+    }
+  }
+}
