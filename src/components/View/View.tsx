@@ -5,18 +5,30 @@ import TreeView from "./TreeView";
 import CodeView from "./CodeView";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { a11yDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { api } from "../../User/api";
+import { useSnackbar } from "notistack";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../../hooks/useUser";
 
-const DocumentationContext = createContext<DocumentationProps | undefined>(undefined);
+const DocumentationContext = createContext<DocumentationProps | undefined>(
+  undefined
+);
 
 export const useDocumentation = (): DocumentationProps => {
   const context = useContext(DocumentationContext);
   if (context === undefined) {
-    throw new Error('useDocumentation must be used within a DocumentationProvider');
+    throw new Error(
+      "useDocumentation must be used within a DocumentationProvider"
+    );
   }
   return context;
 };
 
 const View = () => {
+  const { user, setUser } = useUser();
+  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
+
   const viewOptions = [
     { value: "tree", label: "Tree" },
     { value: "algorithm", label: "Algorithm" },
@@ -96,7 +108,8 @@ def lcm(a, b):
     :return: The LCM of the two numbers.
     \"""
     return abs(a * b) // gcd(a, b)
-`  });
+`,
+  });
 
   const [documentationPos, setDocumentationPos] = useState({ x: 0, y: 0 });
 
@@ -105,79 +118,102 @@ def lcm(a, b):
 
   const handleMouseEnter = () => {
     setDocumentation((prev) => {
-      return { ...prev, show: false }});
-    if (leaveTimeoutRef.current) 
-      clearTimeout(leaveTimeoutRef.current);
+      return { ...prev, show: false };
+    });
+    if (leaveTimeoutRef.current) clearTimeout(leaveTimeoutRef.current);
     hoverTimeoutRef.current = setTimeout(() => {
       setDocumentation((prev) => {
-        return { ...prev, show: true }});
+        return { ...prev, show: true };
+      });
     }, 500);
-  }
+  };
 
   const handleMouseLeave = () => {
-    if (hoverTimeoutRef.current) 
-      clearTimeout(hoverTimeoutRef.current);
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     leaveTimeoutRef.current = setTimeout(() => {
       setDocumentation((prev) => {
-        return { ...prev, show: false }});
+        return { ...prev, show: false };
+      });
     }, 700);
-  }
+  };
+
+  useEffect(() => {
+    api.get("/users/test").catch((error) => {
+      if (error.response.status === 401) {
+        setUser(null);
+        enqueueSnackbar("You must be signed in!", { variant: "info" });
+        navigate("/signin");
+      }
+    });
+  }, []);
 
   return (
-    <DocumentationContext.Provider value={{documentation, setDocumentation}}>
-    <div className="view" onMouseMove={(e) => {
-      const left = e.currentTarget.getBoundingClientRect().right;
-      if (!documentation.show)
-        setDocumentationPos({x: left - e.clientX, y: e.clientY})
-      }}>
-      <div
-        className={
-          documentation.show
-            ? "view__documentation active"
-            : "view__documentation"
-        }
-        style={{ right: documentationPos.x - 260, top: documentationPos.y - 240}}
-        onMouseEnter={() =>
-          {
-            if (leaveTimeoutRef.current) {
-              clearTimeout(leaveTimeoutRef.current);
+    <DocumentationContext.Provider value={{ documentation, setDocumentation }}>
+      {user && (
+        <div
+          className="view"
+          onMouseMove={(e) => {
+            const left = e.currentTarget.getBoundingClientRect().right;
+            if (!documentation.show)
+              setDocumentationPos({ x: left - e.clientX, y: e.clientY });
+          }}
+        >
+          <div
+            className={
+              documentation.show
+                ? "view__documentation active"
+                : "view__documentation"
             }
-            setDocumentation((prev) => {
-            return { ...prev, show: true };
-          })}
-        }
-        onMouseLeave={handleMouseLeave}
-      >
-      <SyntaxHighlighter className="view__documentation__syntax" language="python" style={a11yDark} wrapLongLines={true}>
-        {documentation.text}
-      </SyntaxHighlighter>
-      </div>
-      <div className="view__options">
-        <div className="view__options__select">
-          View mode:
-          <Select
-            className="view__options__select__box"
-            isSearchable={false}
-            options={viewOptions}
-            value={view}
-            onChange={(option) => {
-              setView({
-                value: option?.value as string,
-                label: option?.label as string,
+            style={{
+              right: documentationPos.x - 260,
+              top: documentationPos.y - 240,
+            }}
+            onMouseEnter={() => {
+              if (leaveTimeoutRef.current) {
+                clearTimeout(leaveTimeoutRef.current);
+              }
+              setDocumentation((prev) => {
+                return { ...prev, show: true };
               });
             }}
-          />
+            onMouseLeave={handleMouseLeave}
+          >
+            <SyntaxHighlighter
+              className="view__documentation__syntax"
+              language="python"
+              style={a11yDark}
+              wrapLongLines={true}
+            >
+              {documentation.text}
+            </SyntaxHighlighter>
+          </div>
+          <div className="view__options">
+            <div className="view__options__select">
+              View mode:
+              <Select
+                className="view__options__select__box"
+                isSearchable={false}
+                options={viewOptions}
+                value={view}
+                onChange={(option) => {
+                  setView({
+                    value: option?.value as string,
+                    label: option?.label as string,
+                  });
+                }}
+              />
+            </div>
+          </div>
+          {view.value == "tree" ? (
+            <TreeView
+              handleMouseEnter={handleMouseEnter}
+              handleMouseLeave={handleMouseLeave}
+            />
+          ) : (
+            <CodeView />
+          )}
         </div>
-      </div>
-      {view.value == "tree" ? (
-        <TreeView
-          handleMouseEnter={handleMouseEnter}
-          handleMouseLeave={handleMouseLeave}
-        />
-      ) : (
-        <CodeView />
       )}
-    </div>
     </DocumentationContext.Provider>
   );
 };
@@ -193,11 +229,3 @@ export interface DocumentationProps {
   documentation: DocumentationState;
   setDocumentation: React.Dispatch<React.SetStateAction<DocumentationState>>;
 }
-
-
-
-
-
-
-
-

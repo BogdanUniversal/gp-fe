@@ -1,4 +1,5 @@
 .view {
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -102,6 +103,9 @@
   flex-direction: row;
   gap: 1em;
 }
+.view__tree__options__tooltip {
+  font-size: 1.5em;
+}
 .view__tree__options__icon {
   border: 1px solid grey;
   padding: 0.3em;
@@ -144,10 +148,4 @@
 .view__tree__group__text {
   position: absolute;
   transform: translateX(1%);
-}
-.view__tree__node__branch > circle {
-  fill: burlywood;
-}
-.view__tree__node__leaf {
-  fill: white;
 }/*# sourceMappingURL=view.css.map */

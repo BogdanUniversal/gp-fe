@@ -1,0 +1,24 @@
+.signin {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.signin__header {
+  color: #e5e5e5;
+}
+.signin__form {
+  width: 30em;
+  padding: 5em;
+  border-radius: 10px;
+  background-color: whitesmoke;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5em;
+}
+.signin__form__textfield {
+  width: 25em;
+}/*# sourceMappingURL=signin.css.map */

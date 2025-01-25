@@ -1,0 +1,32 @@
+@import "../styles/styles.scss";
+
+.signup {
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    &__header {
+        color: $text;
+    }
+    &__form {
+        width: 30em;
+        padding: 5em;
+        border-radius: 10px;
+        background-color: whitesmoke;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1.5em;
+
+        &__textfield {
+            width: 25em;
+        }
+
+        &__tooltip {
+            font-size: 1.5em;
+        }
+    }
+}

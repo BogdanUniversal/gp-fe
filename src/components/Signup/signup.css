@@ -1,0 +1,27 @@
+.signup {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.signup__header {
+  color: #e5e5e5;
+}
+.signup__form {
+  width: 30em;
+  padding: 5em;
+  border-radius: 10px;
+  background-color: whitesmoke;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5em;
+}
+.signup__form__textfield {
+  width: 25em;
+}
+.signup__form__tooltip {
+  font-size: 1.5em;
+}/*# sourceMappingURL=signup.css.map */

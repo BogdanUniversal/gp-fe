@@ -1,10 +1,9 @@
 @import "../styles/styles.scss";
 
 .view {
-  // overflow: hidden;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  // justify-content: center;
   align-items: center;
   width: 100%;
   position: relative;
@@ -20,10 +19,6 @@
     position: absolute;
     display: none;
     z-index: 999;
-
-    &__syntax {
-      // font-size: 3em;
-    }
 
     &::-webkit-scrollbar-track {
       border-radius: 10px;
@@ -72,9 +67,6 @@
   }
 
   &__code {
-    // width: 70%;
-    // overflow-y: scroll;
-    // flex-grow: 1;
     height: 75vh;
     width: 60vw;
 
@@ -121,6 +113,10 @@
       display: flex;
       flex-direction: row;
       gap: 1em;
+
+      &__tooltip {
+        font-size: 1.5em;
+      }
 
       &__icon {
         border: 1px solid grey;
@@ -190,28 +186,9 @@
         }
       }
 
-      &__circle2 {
-        // position: absolute;
-      }
-
       &__text {
         position: absolute;
         transform: translateX(1%);
-      }
-    }
-
-    &__node {
-      &__root {
-      }
-
-      &__branch {
-        & > circle {
-          fill: burlywood;
-        }
-      }
-
-      &__leaf {
-        fill: white;
       }
     }
   }

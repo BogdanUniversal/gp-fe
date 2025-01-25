@@ -3,8 +3,8 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { MdCenterFocusWeak } from "react-icons/md";
 import { BiExpand } from "react-icons/bi";
 import { BiCollapse } from "react-icons/bi";
-import { Tooltip } from "react-tooltip";
 import TreeViewNode from "./TreeViewNode";
+import { Tooltip } from "@mui/material";
 
 const TreeView = ({
   handleMouseEnter,
@@ -123,37 +123,48 @@ const TreeView = ({
   return (
     <div className="view__tree" ref={treeContainerRef}>
       <div className="view__tree__options">
-        <Tooltip id="options-tooltip" />
-        <div
-          data-tooltip-id="options-tooltip"
-          data-tooltip-content="Collapse tree"
-          className="view__tree__options__icon first"
-          onClick={() => {
-            setCollapse(true);
-            setTriggerRecenter((prevState) => prevState + 1);
-          }}
+        <Tooltip
+          title={
+            <span className="view__tree__options__tooltip">Collapse Tree</span>
+          }
+          arrow
         >
-          <BiCollapse className="view__tree__options__icon__svg" />
-        </div>
-        <div
-          data-tooltip-id="options-tooltip"
-          data-tooltip-content="Expand tree"
-          className="view__tree__options__icon"
-          onClick={() => {
-            setCollapse(false);
-            setTriggerRecenter((prevState) => prevState + 1);
-          }}
+          <div
+            className="view__tree__options__icon first"
+            onClick={() => {
+              setCollapse(true);
+              setTriggerRecenter((prevState) => prevState + 1);
+            }}
+          >
+            <BiCollapse className="view__tree__options__icon__svg" />
+          </div>
+        </Tooltip>
+        <Tooltip
+          title={
+            <span className="view__tree__options__tooltip">Expand Tree</span>
+          }
+          arrow
         >
-          <BiExpand className="view__tree__options__icon__svg" />
-        </div>
-        <div
-          data-tooltip-id="options-tooltip"
-          data-tooltip-content="Recenter tree (current depth)"
-          className="view__tree__options__icon"
-          onClick={recenterTree}
+          <div
+            className="view__tree__options__icon"
+            onClick={() => {
+              setCollapse(false);
+              setTriggerRecenter((prevState) => prevState + 1);
+            }}
+          >
+            <BiExpand className="view__tree__options__icon__svg" />
+          </div>
+        </Tooltip>
+        <Tooltip
+          title={
+            <span className="view__tree__options__tooltip">Center Tree</span>
+          }
+          arrow
         >
-          <MdCenterFocusWeak className="view__tree__options__icon__svg" />
-        </div>
+          <div className="view__tree__options__icon" onClick={recenterTree}>
+            <MdCenterFocusWeak className="view__tree__options__icon__svg" />
+          </div>
+        </Tooltip>
       </div>
       {TreeMemo}
     </div>

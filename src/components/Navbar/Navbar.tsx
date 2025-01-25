@@ -6,9 +6,11 @@ import { MdModelTraining, MdOutlineInfo } from "react-icons/md";
 import { GrView } from "react-icons/gr";
 import { IoIosArrowForward } from "react-icons/io";
 import { useEffect, useState } from "react";
+import Profile from "../Profile/Profile";
 
 const Navbar = () => {
     return <div className="navbar__wrapper">
+        <Profile/>
         <div className="navbar">
             <div className="navbar__header"><BsFillMenuButtonWideFill />Menu</div>
             <NavLink
