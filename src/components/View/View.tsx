@@ -1,14 +1,10 @@
 import "./view.css";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 import Select from "react-select";
 import TreeView from "./TreeView";
 import CodeView from "./CodeView";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { a11yDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import { api } from "../../User/api";
-import { useSnackbar } from "notistack";
-import { useNavigate } from "react-router-dom";
-import { useUser } from "../../hooks/useUser";
 
 const DocumentationContext = createContext<DocumentationProps | undefined>(
   undefined
@@ -25,10 +21,6 @@ export const useDocumentation = (): DocumentationProps => {
 };
 
 const View = () => {
-  const { user, setUser } = useUser();
-  const navigate = useNavigate();
-  const { enqueueSnackbar } = useSnackbar();
-
   const viewOptions = [
     { value: "tree", label: "Tree" },
     { value: "algorithm", label: "Algorithm" },
@@ -137,19 +129,9 @@ def lcm(a, b):
     }, 700);
   };
 
-  useEffect(() => {
-    api.get("/users/test").catch((error) => {
-      if (error.response.status === 401) {
-        setUser(null);
-        enqueueSnackbar("You must be signed in!", { variant: "info" });
-        navigate("/signin");
-      }
-    });
-  }, []);
 
   return (
     <DocumentationContext.Provider value={{ documentation, setDocumentation }}>
-      {user && (
         <div
           className="view"
           onMouseMove={(e) => {
@@ -213,7 +195,7 @@ def lcm(a, b):
             <CodeView />
           )}
         </div>
-      )}
+
     </DocumentationContext.Provider>
   );
 };

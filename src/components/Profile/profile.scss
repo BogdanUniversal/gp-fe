@@ -3,9 +3,8 @@
 .profile {
     position: absolute;
     z-index: 1;
-    top: 1em;
-    right: 1em;
-    // width: 10em;
+    // top: 1em;
+    right: 0em;
 
     &:hover {
         & .profile__options {
@@ -19,6 +18,7 @@
     }
 
     &__main {
+        height: 3em;
         background-color: $secondary;
         display: flex;
         flex-direction: row;
@@ -26,21 +26,19 @@
         align-items: center;
         color: $text;
         font-weight: 500;
-        padding: 0.7em;
+        padding: 0 0.7em;
         border-radius: 10px;
-        opacity: 0.6;
         border: 1px solid whitesmoke;
 
         &:hover {
             background-color: $fourtary;
-            opacity: 1;
             cursor: pointer;
         }
 
         &__icon {
             margin-right: 0.2em;
             fill: $text;
-            font-size: 3em;
+            font-size: 2em;
         }
     }
     

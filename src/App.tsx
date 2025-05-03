@@ -1,18 +1,61 @@
 import "./App.css";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import {
+  Navigate,
+  RouterProvider,
+  createBrowserRouter,
+} from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Home from "./components/Home/Home";
 import View from "./components/View/View";
 import Signup from "./components/Signup/Signup";
 import Signin from "./components/Signin/Signin";
-import { SnackbarProvider } from "notistack";
-import { UserContext } from "./User/userContext";
-import { useState } from "react";
+import Train from "./components/Train/Train";
+import { enqueueSnackbar, SnackbarProvider } from "notistack";
+import { useEffect, useState } from "react";
 import { User } from "./hooks/useUser";
+import { api } from "./User/api";
+import Steps from "./components/Train/Steps";
+import Data from "./components/Train/Data";
 
+import { UserContext } from "./User/userContext";
 
 function App() {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<User | null | undefined>(undefined);
+  
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await api.get("/users/test", {
+          withCredentials: true,
+        });
+        console.log("Test response:", response.data);
+        setUser({ name: response.data.user }); // Set user if authenticated
+      } catch (error) {
+        console.log("Test failed:", error);
+        setUser(null); // Set user to null if not authenticated
+        enqueueSnackbar("You must be signed in!", { variant: "info" });
+      }
+    };
+
+    checkAuth(); // Call the checkAuth function to verify authentication status
+  }, []);
+
+  interface ProtectedRouteProps {
+    children: JSX.Element;
+  }
+
+  const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+    if (user === undefined) {
+      return null; // Render nothing while waiting for the authentication check
+    }
+
+    if (!user) {
+      enqueueSnackbar("You must be signed in!", { variant: "info" });
+      return <Navigate to="/signin" replace />;
+    }
+
+    return children;
+  };
 
   const router = createBrowserRouter([
     {
@@ -23,8 +66,38 @@ function App() {
           element: <Home />,
         },
         {
+          path: "/train",
+          element: (
+            <ProtectedRoute>
+              <Train />
+            </ProtectedRoute>
+          ),
+          children: [
+            {
+              path: "",
+              element: (
+                <ProtectedRoute>
+                  <Steps />
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: "data",
+              element: (
+                <ProtectedRoute>
+                  <Data />
+                </ProtectedRoute>
+              ),
+            },
+          ],
+        },
+        {
           path: "/view",
-          element: <View />,
+          element: (
+            <ProtectedRoute>
+              <View />
+            </ProtectedRoute>
+          ),
         },
         {
           path: "/signup",
@@ -40,11 +113,11 @@ function App() {
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
-    <SnackbarProvider maxSnack={3} autoHideDuration={2000}>
-      <div className="App">
-        <RouterProvider router={router} />
-      </div>
-    </SnackbarProvider>
+      <SnackbarProvider maxSnack={3} autoHideDuration={2000}>
+        <div className="App">
+          <RouterProvider router={router} />
+        </div>
+      </SnackbarProvider>
     </UserContext.Provider>
   );
 }

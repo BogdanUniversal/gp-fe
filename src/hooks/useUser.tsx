@@ -3,6 +3,7 @@ import { UserContext } from "../User/userContext";
 import { useSnackbar } from "notistack";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { api } from "../User/api";
 
 export interface User {
   name: string;
@@ -16,8 +17,8 @@ export const useUser = () => {
   const addUser = async (email: string | null, password: string | null) => {
     try {
         if (email && password) {
-          const response = await axios.post(
-            "http://localhost:5000/users/signin",
+          const response = await api.post(
+            "/users/signin",
             { email: email, password: password },
             {
               withCredentials: true,
@@ -25,6 +26,7 @@ export const useUser = () => {
           );
           if (response.request.status === 201) {
             setUser({name: response.data.first_name});
+            localStorage.setItem("user", JSON.stringify(response.data.first_name));
             enqueueSnackbar("Signed in sucesfully!", { variant: "success" });
             navigate("/");
           }
@@ -42,13 +44,14 @@ export const useUser = () => {
 
   const removeUser = async () => {
     try {
-      await axios.post("http://localhost:5000/users/signout");
+      await api.get("/users/signout", { withCredentials: true });
+      localStorage.removeItem("user");
+      setUser(null);
       enqueueSnackbar("Signed out!", { variant: "info" });
-      navigate("/");
+      navigate("/", { replace: true });
     } catch (error) {
       console.error(error);
     }
-    setUser(null);
   };
 
   return { user, addUser, removeUser, setUser };

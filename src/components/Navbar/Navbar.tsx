@@ -12,7 +12,7 @@ const Navbar = () => {
     return <div className="navbar__wrapper">
         <Profile/>
         <div className="navbar">
-            <div className="navbar__header"><BsFillMenuButtonWideFill />Menu</div>
+            <div className="navbar__header"><div><BsFillMenuButtonWideFill />Menu</div></div>
             <NavLink
                 to="/"
                 className={({ isActive }) => {
