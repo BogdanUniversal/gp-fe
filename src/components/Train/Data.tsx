@@ -1,26 +1,22 @@
 import { Button, IconButton } from "@mui/material";
 import "./train.css";
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { FaFileCsv } from "react-icons/fa6";
 import { IoMdCloseCircle } from "react-icons/io";
 import { useSnackbar } from "notistack";
 import { FaAngleRight } from "react-icons/fa";
+import { api } from "../../User/api";
+import Loader from "../Loader/Loader";
 
 const Data = () => {
   const MAX_SIZE = 50000000; // 50MB
   const [previousFiles, setPreviousFiles] = useState<
     Array<{ name: string; date: string }>
-  >([
-    { name: "asdwe", date: "25/10/2024" },
-    { name: "123213dsqwe", date: "10/09/2024" },
-    { name: "w213129213 going to bed", date: "31/10/2024" },
-    { name: "asdwe", date: "25/10/2024" },
-    { name: "123213dsqwe", date: "10/09/2024" },
-    { name: "w213129213 going to bed", date: "31/10/2024" },
-  ]);
+  >([]);
   const { enqueueSnackbar } = useSnackbar();
   const [isFileSelected, setIsFileSelected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     accept: { "text/csv": [".csv"] },
     multiple: false,
@@ -48,13 +44,69 @@ const Data = () => {
     </div>
   ));
 
+  const handleGetDatasets = async () => {
+    try {
+      setIsLoading(true);
+      const response = await api.get("/datasets/get_datasets", {
+        withCredentials: true,
+      });
+
+      const datasets = response.data.datasets;
+      if (datasets.length === 0) setPreviousFiles([]);
+      else
+        setPreviousFiles(
+          datasets.map((dataset: { name: string; upload_date: string }) => ({
+            name: dataset.name,
+            date: new Date(dataset.upload_date).toLocaleDateString(),
+          }))
+        );
+      setIsLoading(false);
+    } catch (error) {
+      enqueueSnackbar("Error fetching datasets", { variant: "error" });
+    }
+  };
+
+  const handleUpload = async () => {
+    if (acceptedFiles.length) {
+      const file = acceptedFiles[0];
+      const formData = new FormData();
+      formData.append("name", file.name.substring(0, file.name.length - 4));
+      formData.append("dataset", file);
+
+      api
+        .postForm("/datasets/upload", formData, {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          data: formData,
+        })
+        .then(async () => {
+          enqueueSnackbar("File uploaded successfully!", {
+            variant: "success",
+          });
+          setIsFileSelected(false);
+          await handleGetDatasets();
+        })
+        .catch(() => {
+          enqueueSnackbar("Error uploading file", { variant: "error" });
+        });
+    }
+  };
+
+  useEffect(() => {
+    handleGetDatasets();
+  }, []);
+
   return (
     <div className="data">
       <div className="data__header">Select the dataset for training</div>
       <div className="data__previous">
         <div className="data__previous__header">Previous uploaded datasets</div>
         <div className="data__previous__files">
-          {previousFiles.length > 0 ? (
+          {isLoading ? (
+            <Loader />
+          ) : previousFiles.length > 0 ? (
             previousFiles.map((file, index) => (
               <div key={index} className="data__previous__files__file">
                 <FaFileCsv /> <div>{file.name}</div>
@@ -100,6 +152,7 @@ const Data = () => {
                 <Button
                   variant="contained"
                   className="data__dropzone__upload__button"
+                  onClick={handleUpload}
                 >
                   Upload
                 </Button>

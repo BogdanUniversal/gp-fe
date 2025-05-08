@@ -114,6 +114,19 @@
   background-color: whitesmoke;
   border-radius: 10px;
 }
+.data__previous::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #333333;
+}
+.data__previous::-webkit-scrollbar {
+  border-radius: 10px;
+  width: 15px;
+  background-color: #4a4a4a;
+}
+.data__previous::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #4a4a4a;
+}
 .data__previous__header {
   position: sticky;
   top: 0;
@@ -126,6 +139,7 @@
   display: flex;
   flex-direction: column;
   gap: 1em;
+  height: 10em;
 }
 .data__previous__files__file {
   display: flex;

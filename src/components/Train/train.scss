@@ -109,7 +109,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-    gap: 1em;
+  gap: 1em;
 
   &__header {
     font-size: 1.3em;
@@ -127,6 +127,22 @@
     background-color: whitesmoke;
     border-radius: 10px;
 
+    &::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+      background-color: #333333;
+    }
+
+    &::-webkit-scrollbar {
+      border-radius: 10px;
+      width: 15px;
+      background-color: #4a4a4a;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      background-color: #4a4a4a;
+    }
+
     &__header {
       position: sticky;
       top: 0;
@@ -140,6 +156,7 @@
       display: flex;
       flex-direction: column;
       gap: 1em;
+      height: 10em;
 
       &__file {
         display: flex;

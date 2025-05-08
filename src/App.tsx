@@ -3,6 +3,7 @@ import {
   Navigate,
   RouterProvider,
   createBrowserRouter,
+  useNavigate,
 } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Home from "./components/Home/Home";
@@ -18,6 +19,7 @@ import Steps from "./components/Train/Steps";
 import Data from "./components/Train/Data";
 
 import { UserContext } from "./User/userContext";
+import Loader from "./components/Loader/Loader";
 
 function App() {
   const [user, setUser] = useState<User | null | undefined>(undefined);
@@ -32,12 +34,11 @@ function App() {
         setUser({ name: response.data.user }); // Set user if authenticated
       } catch (error) {
         console.log("Test failed:", error);
-        setUser(null); // Set user to null if not authenticated
-        enqueueSnackbar("You must be signed in!", { variant: "info" });
+        setUser(null);
       }
     };
 
-    checkAuth(); // Call the checkAuth function to verify authentication status
+    checkAuth();
   }, []);
 
   interface ProtectedRouteProps {
@@ -45,8 +46,24 @@ function App() {
   }
 
   const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+    const navigate = useNavigate();
+    const checkAuth = async () => {
+      try {
+        const response = await api.get("/users/test", {
+          withCredentials: true,
+        });
+        console.log("Test response:", response.data);
+      } catch (error) {
+        console.log("Test failed:", error);
+        setUser(null);
+        navigate("/signin", { replace: true });
+      }
+    };
+
+    checkAuth();
+
     if (user === undefined) {
-      return null; // Render nothing while waiting for the authentication check
+      return <Loader />; // Render loader while waiting for the authentication check
     }
 
     if (!user) {

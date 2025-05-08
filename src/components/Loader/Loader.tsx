@@ -1,0 +1,13 @@
+import "./loader.css";
+import { Tailspin } from "ldrs/react";
+import "ldrs/react/Tailspin.css";
+
+const Loader = () => {
+  return (
+    <div className="loader">
+      <Tailspin size="60" stroke="6" speed="0.9" color="grey" />
+    </div>
+  );
+};
+
+export default Loader;
