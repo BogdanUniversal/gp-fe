@@ -1,5 +1,8 @@
 import { createContext, Dispatch, SetStateAction } from "react";
-import { User } from "../hooks/useUser";
+
+export interface User {
+  name: string;
+}
 
 interface UserContext {
   user: User | null | undefined;

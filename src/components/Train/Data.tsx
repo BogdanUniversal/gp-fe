@@ -1,6 +1,6 @@
 import { Button, IconButton } from "@mui/material";
 import "./train.css";
-import { SetStateAction, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { FaFileCsv } from "react-icons/fa6";
 import { IoMdCloseCircle } from "react-icons/io";
@@ -8,11 +8,12 @@ import { useSnackbar } from "notistack";
 import { FaAngleRight } from "react-icons/fa";
 import { api } from "../../User/api";
 import Loader from "../Loader/Loader";
+import { DatasetContext } from "../../Data/dataContext";
 
 const Data = () => {
   const MAX_SIZE = 50000000; // 50MB
   const [previousFiles, setPreviousFiles] = useState<
-    Array<{ name: string; date: string }>
+    Array<{ id: string; name: string; date: string }>
   >([]);
   const { enqueueSnackbar } = useSnackbar();
   const [isFileSelected, setIsFileSelected] = useState(false);
@@ -36,6 +37,7 @@ const Data = () => {
     },
     disabled: isFileSelected,
   });
+  const { dataset, setDataset } = useContext(DatasetContext);
 
   const files = acceptedFiles.map((file) => (
     <div key={file.path}>
@@ -53,13 +55,21 @@ const Data = () => {
 
       const datasets = response.data.datasets;
       if (datasets.length === 0) setPreviousFiles([]);
-      else
+      else {
         setPreviousFiles(
-          datasets.map((dataset: { name: string; upload_date: string }) => ({
-            name: dataset.name,
-            date: new Date(dataset.upload_date).toLocaleDateString(),
-          }))
+          datasets.map(
+            (dataset: { id: string; name: string; upload_date: string }) => ({
+              id: dataset.id,
+              name: dataset.name,
+              date: new Date(dataset.upload_date).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              }),
+            })
+          )
         );
+      }
       setIsLoading(false);
     } catch (error) {
       enqueueSnackbar("Error fetching datasets", { variant: "error" });
@@ -94,6 +104,33 @@ const Data = () => {
     }
   };
 
+  const handleSelectDataset = async (datasetId: string) => {
+    setIsLoading(true);
+    await api
+      .get("/datasets/get_dataset", {
+        withCredentials: true,
+        params: { dataset_id: datasetId },
+      })
+      .then((response) => {
+        setDataset({
+          id: response.data.dataset.id,
+          name: response.data.dataset.name,
+          data: response.data.dataset.data,
+          columns: response.data.dataset.columns,
+          totalRows: response.data.dataset.total_rows,
+          totalColumns: response.data.dataset.total_columns,
+        });
+        enqueueSnackbar("Dataset selected!", {
+          variant: "success",
+        });
+        setIsLoading(false);
+      })
+      .catch(() => {
+        enqueueSnackbar("Error selecting dataset!", { variant: "error" });
+        setIsLoading(false);
+      });
+  };
+
   useEffect(() => {
     handleGetDatasets();
   }, []);
@@ -107,9 +144,16 @@ const Data = () => {
           {isLoading ? (
             <Loader />
           ) : previousFiles.length > 0 ? (
-            previousFiles.map((file, index) => (
-              <div key={index} className="data__previous__files__file">
-                <FaFileCsv /> <div>{file.name}</div>
+            previousFiles.map((file) => (
+              <div
+                key={file.id}
+                className={file.id === dataset?.id ? "data__previous__files__file active" : "data__previous__files__file"}
+                onClick={() => handleSelectDataset(file.id)}
+              >
+                <FaFileCsv className="data__previous__files__file__icon" />{" "}
+                <div className="data__previous__files__file__name">
+                  {file.name}
+                </div>
                 <div className="data__previous__files__file__date">
                   {file.date}
                 </div>

@@ -108,8 +108,8 @@
 .data__previous {
   display: flex;
   flex-direction: column;
-  height: 10em;
-  width: 30em;
+  height: 13em;
+  width: 60em;
   overflow: auto;
   background-color: whitesmoke;
   border-radius: 10px;
@@ -155,9 +155,13 @@
   cursor: default;
 }
 .data__previous__files__file.empty:hover {
-  background-color: unset; /* Remove hover background */
-  color: unset; /* Remove hover color */
-  transition: none; /* Disable hover transition */
+  background-color: unset;
+  color: unset;
+  transition: none;
+}
+.data__previous__files__file__name {
+  overflow: hidden;
+  width: 70%;
 }
 .data__previous__files__file__date {
   margin-left: auto;
@@ -166,6 +170,11 @@
   background-color: #2e96b7;
   color: whitesmoke;
   transition: 0.3s all;
+}
+.data__previous__files__file.active {
+  pointer-events: none;
+  background-color: #2e96b7;
+  color: whitesmoke;
 }
 .data__dropzone {
   background-color: whitesmoke;
@@ -233,4 +242,44 @@
   justify-content: center;
   gap: 0.5em;
   height: 2em;
+}
+
+.parametrization__table {
+  width: 50em;
+}
+.parametrization__cell {
+  opacity: 0.8;
+}
+.parametrization__cell.active {
+  background-color: #323A47;
+  color: whitesmoke;
+  opacity: 1;
+}
+.parametrization__header {
+  opacity: 0.8;
+  cursor: pointer;
+  transition: 0.3s all;
+}
+.parametrization__header:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+.parametrization__header.active {
+  opacity: 1;
+}
+.parametrization__footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.parametrization__footer__child {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1em;
+  padding: 1em;
+  margin-right: auto;
+}
+.parametrization__footer__label {
+  font-weight: 900;
 }/*# sourceMappingURL=train.css.map */

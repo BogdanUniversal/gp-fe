@@ -13,13 +13,14 @@ import Signin from "./components/Signin/Signin";
 import Train from "./components/Train/Train";
 import { enqueueSnackbar, SnackbarProvider } from "notistack";
 import { useEffect, useState } from "react";
-import { User } from "./hooks/useUser";
+import { User } from "./User/userContext";
 import { api } from "./User/api";
 import Steps from "./components/Train/Steps";
 import Data from "./components/Train/Data";
 
 import { UserContext } from "./User/userContext";
 import Loader from "./components/Loader/Loader";
+import Parametrization from "./components/Train/Parametrization";
 
 function App() {
   const [user, setUser] = useState<User | null | undefined>(undefined);
@@ -103,6 +104,14 @@ function App() {
               element: (
                 <ProtectedRoute>
                   <Data />
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: "parametrization",
+              element: (
+                <ProtectedRoute>
+                  <Parametrization />
                 </ProtectedRoute>
               ),
             },

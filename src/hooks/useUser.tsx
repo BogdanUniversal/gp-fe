@@ -5,9 +5,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { api } from "../User/api";
 
-export interface User {
-  name: string;
-}
 
 export const useUser = () => {
   const { user, setUser } = useContext(UserContext);

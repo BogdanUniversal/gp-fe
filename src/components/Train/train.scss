@@ -121,8 +121,8 @@
   &__previous {
     display: flex;
     flex-direction: column;
-    height: 10em;
-    width: 30em;
+    height: 13em;
+    width: 60em;
     overflow: auto;
     background-color: whitesmoke;
     border-radius: 10px;
@@ -169,23 +169,34 @@
         cursor: pointer;
 
         &.empty {
-            cursor: default;
+          cursor: default;
 
-            &:hover {
-                background-color: unset; /* Remove hover background */
-                color: unset; /* Remove hover color */
-                transition: none; /* Disable hover transition */
-              }
+          &:hover {
+            background-color: unset;
+            color: unset;
+            transition: none;
+          }
+        }
+
+        &__name {
+          overflow: hidden;
+          width: 70%;
         }
 
         &__date {
-            margin-left: auto;
+          margin-left: auto;
         }
 
         &:hover {
-            background-color: #2e96b7;
-            color: whitesmoke;
-            transition: 0.3s all;
+          background-color: #2e96b7;
+          color: whitesmoke;
+          transition: 0.3s all;
+        }
+
+        &.active {
+          pointer-events: none;
+          background-color: #2e96b7;
+          color: whitesmoke;
         }
       }
     }
@@ -264,6 +275,55 @@
       justify-content: center;
       gap: 0.5em;
       height: 2em;
+    }
+  }
+}
+
+.parametrization {
+  &__table {
+    width: 50em;
+  }
+
+  &__cell {
+    opacity: 0.8; 
+    &.active {
+      background-color: $secondary;
+      color: whitesmoke;
+      opacity: 1;
+    }
+  }
+
+  &__header {
+    opacity: 0.8;
+    cursor: pointer;
+    transition: 0.3s all;
+
+    &:hover {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+
+    &.active {
+      opacity: 1;
+    }
+  }
+
+  &__footer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    
+    &__child {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1em;
+      padding: 1em;
+      margin-right: auto;
+    }
+
+    &__label {
+      font-weight: 900;
     }
   }
 }
