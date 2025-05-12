@@ -7,6 +7,7 @@ import {
   GridOverlay,
 } from "@mui/x-data-grid";
 import { DatasetContext } from "../../Data/dataContext";
+import { Autocomplete, TextField } from "@mui/material";
 
 const Parametrization = () => {
   const { dataset, setDataset } = useContext(DatasetContext);
@@ -15,6 +16,22 @@ const Parametrization = () => {
   const [selectedColumn, setSelectedColumn] = useState<string>(
     dataset?.columns[dataset?.columns.length - 1] || ""
   );
+
+  const correlationOptions = ["Pearson", "Spearman", "Kendall"];
+  const [selectedCorrelation, setSelectedCorrelation] =
+    useState<string>("Pearson");
+
+  const scalingOptions = ["Standardization", "MinMax", "Robust"];
+  const [selectedScaling, setSelectedScaling] =
+    useState<string>("Standardization");
+
+  const dimensionalityReductionOptions = ["PCA", "UMAP"];
+  const [selectedDimensionalityReduction, setSelectedDimensionalityReduction] =
+    useState<string>("PCA");
+
+  const [population, setPopulation] = useState<number>(50);
+
+  const [generations, setGenerations] = useState<number>(100);
 
   useEffect(() => {
     if (dataset) {
@@ -65,10 +82,12 @@ const Parametrization = () => {
           sortable: false,
         },
       ];
-      const generatedRows = [{
-        id: 1,
-        loading: "Cannot parametrize without a dataset.",
-      }];
+      const generatedRows = [
+        {
+          id: 1,
+          loading: "Cannot parametrize without a dataset.",
+        },
+      ];
 
       setColumns(generatedColumns);
       setRows(generatedRows);
@@ -77,14 +96,12 @@ const Parametrization = () => {
 
   return (
     <div className="parametrization">
-      <h1>Parametrization</h1>
-      <p>Here you can set the parameters for the training.</p>
-      {/* Add your parametrization form or options here */}
       <div className="parametrization__table">
         <DataGrid
           hideFooter={dataset ? false : true}
           rows={rows}
           columns={columns}
+          pageSizeOptions={[5]}
           initialState={{
             pagination: {
               paginationModel: {
@@ -112,6 +129,80 @@ const Parametrization = () => {
                 </div>
               );
             },
+          }}
+        />
+      </div>
+      <div className="parametrization__options">
+        <Autocomplete
+          disabled={!dataset}
+          disablePortal
+          options={scalingOptions}
+          value={selectedScaling}
+          onChange={(e, value) => {
+            setSelectedScaling(value || "");
+          }}
+          renderInput={(params) => (
+            <TextField
+            helperText="Choose a method to scale the features" 
+            {...params} label="Scaling method" />
+          )}
+        />
+        <Autocomplete
+          disabled={!dataset}
+          disablePortal
+          options={correlationOptions}
+          value={selectedCorrelation}
+          onChange={(e, value) => {
+            setSelectedCorrelation(value || "");
+          }}
+          renderInput={(params) => (
+            <TextField
+              helperText="Choose a method to calculate the correlation between the features and the label"
+              {...params}
+              label="Correlation method"
+            />
+          )}
+        />
+        <Autocomplete
+          disabled={!dataset}
+          disablePortal
+          options={dimensionalityReductionOptions}
+          value={selectedDimensionalityReduction}
+          onChange={(e, value) => {
+            setSelectedDimensionalityReduction(value || "");
+          }}
+          renderInput={(params) => (
+            <TextField
+              helperText="Choose a method to reduce the dimensionality of the features"
+              {...params}
+              label="Dimensionality reduction method"
+            />
+          )}
+        />
+        <TextField
+          label="Population size"
+          helperText="Population size for the training (1-100)"
+          type="number"
+          value={population}
+          disabled={!dataset}
+          onChange={(e) => {
+            const value = parseInt(e.target.value);
+            if (!isNaN(value) && value > 0 && value <= 100) {
+              setPopulation(value);
+            }
+          }}
+        />
+        <TextField
+          label="Generations"
+          helperText="Number of generations for the training (1-500)"
+          type="number"
+          value={generations}
+          disabled={!dataset}
+          onChange={(e) => {
+            const value = parseInt(e.target.value);
+            if (!isNaN(value) && value > 0 && value <= 500) {
+              setGenerations(value);
+            }
           }}
         />
       </div>

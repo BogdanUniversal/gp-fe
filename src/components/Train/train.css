@@ -62,6 +62,8 @@
   width: 10em;
   height: 15em;
   border-radius: 20px;
+  text-decoration: none;
+  color: #333333;
 }
 .steps__step:hover {
   transform: scale(1.1);
@@ -282,4 +284,11 @@
 }
 .parametrization__footer__label {
   font-weight: 900;
+}
+.parametrization__options {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }/*# sourceMappingURL=train.css.map */
