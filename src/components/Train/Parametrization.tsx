@@ -7,7 +7,8 @@ import {
   GridOverlay,
 } from "@mui/x-data-grid";
 import { DatasetContext } from "../../Data/dataContext";
-import { Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, Button, TextField } from "@mui/material";
+import { api } from "../../User/api";
 
 const Parametrization = () => {
   const { dataset, setDataset } = useContext(DatasetContext);
@@ -32,6 +33,38 @@ const Parametrization = () => {
   const [population, setPopulation] = useState<number>(50);
 
   const [generations, setGenerations] = useState<number>(100);
+
+  const [treeDepth, setTreeDepth] = useState<number>(10);
+
+  const [crossChance, setCrossChance] = useState<number>(0.5);
+
+  const [mutationChance, setMutationChance] = useState<number>(0.2);
+
+  const [lossFunctions, setLossFunctions] = useState<
+    { id: string; name: string }[]
+  >([
+    { id: "mse", name: "Mean Squared Error" },
+    { id: "mae", name: "Mean Absolute Error" },
+  ]);
+  const [selectedLossFunction, setSelectedLossFunction] = useState<{
+    id: string;
+    name: string;
+  }>({ id: "mse", name: "Mean Squared Error" });
+
+  const getLossFunctions = async () => {
+    api
+      .get("/models/get_loss_functions", {
+        params: { label: selectedColumn },
+        withCredentials: true,
+      })
+      .then((response) => {
+        setLossFunctions(response.data);
+        setSelectedLossFunction(response.data[0]);
+      })
+      .catch((error) => {
+        console.log("Error getting loss functions", error);
+      });
+  };
 
   useEffect(() => {
     if (dataset) {
@@ -71,6 +104,8 @@ const Parametrization = () => {
 
       setColumns(generatedColumns);
       setRows(generatedRows);
+
+      getLossFunctions();
     } else {
       const generatedColumns: GridColDef[] = [
         {
@@ -101,11 +136,11 @@ const Parametrization = () => {
           hideFooter={dataset ? false : true}
           rows={rows}
           columns={columns}
-          pageSizeOptions={[5]}
+          pageSizeOptions={[25, 50]}
           initialState={{
             pagination: {
               paginationModel: {
-                pageSize: 5,
+                pageSize: 25,
               },
             },
           }}
@@ -143,8 +178,10 @@ const Parametrization = () => {
           }}
           renderInput={(params) => (
             <TextField
-            helperText="Choose a method to scale the features" 
-            {...params} label="Scaling method" />
+              helperText="Choose a method to scale the features"
+              {...params}
+              label="Scaling method"
+            />
           )}
         />
         <Autocomplete
@@ -157,7 +194,7 @@ const Parametrization = () => {
           }}
           renderInput={(params) => (
             <TextField
-              helperText="Choose a method to calculate the correlation between the features and the label"
+              helperText="Choose a method to calculate the correlation between the features"
               {...params}
               label="Correlation method"
             />
@@ -181,7 +218,7 @@ const Parametrization = () => {
         />
         <TextField
           label="Population size"
-          helperText="Population size for the training (1-100)"
+          helperText="Population size for the training (1 - 1000)"
           type="number"
           value={population}
           disabled={!dataset}
@@ -194,7 +231,7 @@ const Parametrization = () => {
         />
         <TextField
           label="Generations"
-          helperText="Number of generations for the training (1-500)"
+          helperText="Number of generations for the training (1 - 500)"
           type="number"
           value={generations}
           disabled={!dataset}
@@ -205,6 +242,73 @@ const Parametrization = () => {
             }
           }}
         />
+        <TextField
+          label="Max Tree Depth"
+          helperText="Maximum depth of mutated trees (1 - 25)"
+          type="number"
+          value={treeDepth}
+          disabled={!dataset}
+          onChange={(e) => {
+            const value = parseInt(e.target.value);
+            if (!isNaN(value) && value > 0 && value <= 25) {
+              setTreeDepth(value);
+            }
+          }}
+        />
+        <TextField
+          label="Crossing Chance"
+          helperText="Chance of crossing individuals (0.01 - 1)"
+          type="number"
+          value={crossChance}
+          disabled={!dataset}
+          InputProps={{ inputProps: { min: 0, max: 1, step: 0.01 } }}
+          onChange={(e) => {
+            const value = parseFloat(e.target.value);
+            if (!isNaN(value) && value > 0 && value <= 1) {
+              setCrossChance(value);
+            }
+          }}
+        />
+        <TextField
+          label="Mutation Chance"
+          helperText="Chance of mutating genes (0.01 - 1)"
+          type="number"
+          value={mutationChance}
+          disabled={!dataset}
+          InputProps={{ inputProps: { min: 0, max: 1, step: 0.01 } }}
+          onChange={(e) => {
+            const value = parseFloat(e.target.value);
+            if (!isNaN(value) && value > 0 && value <= 1) {
+              setMutationChance(value);
+            }
+          }}
+        />
+        <Autocomplete
+          disabled={!dataset}
+          disablePortal
+          options={lossFunctions}
+          value={selectedLossFunction}
+          getOptionLabel={(option) => option.name}
+          onChange={(e, value) => {
+            if (value) {
+              setSelectedLossFunction(value);
+            }
+          }}
+          renderInput={(params) => (
+            <TextField
+              helperText="Choose which loss function to use"
+              {...params}
+              label="Loss function"
+            />
+          )}
+        />
+        <Button
+          disabled={!dataset}
+          variant="contained"
+          className="parametrization__options__button"
+        >
+          Save options
+        </Button>
       </div>
     </div>
   );

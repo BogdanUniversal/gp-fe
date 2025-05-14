@@ -246,8 +246,15 @@
   height: 2em;
 }
 
+.parametrization {
+  display: flex;
+  flex-direction: row;
+  height: 93vh;
+  width: 86.7vw;
+}
 .parametrization__table {
-  width: 50em;
+  width: 50%;
+  border-radius: 0;
 }
 .parametrization__cell {
   opacity: 0.8;
@@ -286,9 +293,24 @@
   font-weight: 900;
 }
 .parametrization__options {
+  border-radius: 5px;
+  border-left: 1px #333333 solid;
+  width: 50%;
   background-color: white;
-  display: flex;
+  display: grid;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  grid-template-columns: 1fr 1fr;
+  gap: 2em;
+  padding: 2em 2em 1em 2em;
+  width: 100%;
+}
+.parametrization__options > * {
+  width: 12em;
+  height: 6em;
+}
+.parametrization__options__button {
+  height: 4em;
+  align-self: baseline;
 }/*# sourceMappingURL=train.css.map */
