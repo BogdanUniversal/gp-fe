@@ -302,15 +302,23 @@
   align-items: center;
   justify-content: center;
   grid-template-columns: 1fr 1fr;
-  gap: 2em;
-  padding: 2em 2em 1em 2em;
+  gap: 0 1em;
+  padding: 0 1em 0 1em;
   width: 100%;
 }
 .parametrization__options > * {
-  width: 12em;
-  height: 6em;
+  height: 0.5em;
+}
+.parametrization__options__functions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
+  width: 100%;
 }
 .parametrization__options__button {
+  align-self: center;
+  justify-self: center;
   height: 4em;
-  align-self: baseline;
 }/*# sourceMappingURL=train.css.map */

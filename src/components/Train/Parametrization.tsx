@@ -1,14 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import "./train.css";
-import {
-  DataGrid,
-  GridColDef,
-  GridFooter,
-  GridOverlay,
-} from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridFooter } from "@mui/x-data-grid";
 import { DatasetContext } from "../../Data/dataContext";
-import { Autocomplete, Button, TextField } from "@mui/material";
+import { Autocomplete, Button, Checkbox, Chip, TextField } from "@mui/material";
 import { api } from "../../User/api";
+import { enqueueSnackbar } from "notistack";
 
 const Parametrization = () => {
   const { dataset, setDataset } = useContext(DatasetContext);
@@ -18,13 +14,9 @@ const Parametrization = () => {
     dataset?.columns[dataset?.columns.length - 1] || ""
   );
 
-  const correlationOptions = ["Pearson", "Spearman", "Kendall"];
+  const correlationOptions = ["Spearman", "Pearson", "Kendall"];
   const [selectedCorrelation, setSelectedCorrelation] =
     useState<string>("Pearson");
-
-  const scalingOptions = ["Standardization", "MinMax", "Robust"];
-  const [selectedScaling, setSelectedScaling] =
-    useState<string>("Standardization");
 
   const dimensionalityReductionOptions = ["PCA", "UMAP"];
   const [selectedDimensionalityReduction, setSelectedDimensionalityReduction] =
@@ -42,14 +34,50 @@ const Parametrization = () => {
 
   const [lossFunctions, setLossFunctions] = useState<
     { id: string; name: string }[]
-  >([
-    { id: "mse", name: "Mean Squared Error" },
-    { id: "mae", name: "Mean Absolute Error" },
-  ]);
+  >([{ id: "mse", name: "Mean Squared Error" }]);
   const [selectedLossFunction, setSelectedLossFunction] = useState<{
     id: string;
     name: string;
   }>({ id: "mse", name: "Mean Squared Error" });
+
+  const [fixedFunctions, setFixedFunctions] = useState<
+    { id: string; name: string; type: string }[]
+  >([]);
+  const [functions, setFunctions] = useState<
+    { id: string; name: string; type: string }[]
+  >([{ id: "if", name: "If Then Else", type: "Float" }]);
+  const [selectedFunctions, setSelectedFunctions] = useState<
+    { id: string; name: string; type: string }[]
+  >([]);
+
+  const [options, setOptions] = useState<{
+    corrOpt: string;
+    dimRedOpt: string;
+    popSize: number;
+    genCount: number;
+    treeDepth: number;
+    crossChance: number;
+    mutationChance: number;
+    lossFunction: { id: string; name: string };
+    functions: { id: string; name: string; type: string }[];
+  }>({
+    corrOpt: "Pearson",
+    dimRedOpt: "PCA",
+    popSize: 50,
+    genCount: 100,
+    treeDepth: 10,
+    crossChance: 0.5,
+    mutationChance: 0.2,
+    lossFunction: { id: "mse", name: "Mean Squared Error" },
+    functions: [
+      { id: "if", name: "If Then Else", type: "Primitive" },
+      {
+        id: "rand_gauss_0",
+        name: "Random Normal (0 Mean)",
+        type: "Terminal",
+      },
+    ],
+  });
 
   const getLossFunctions = async () => {
     api
@@ -66,9 +94,79 @@ const Parametrization = () => {
       });
   };
 
+  const getFunctions = async () => {
+    api
+      .get("/models/get_terminals_primitives", { withCredentials: true })
+      .then((response) => {
+        console.log("Functions and Primitives", response.data);
+        setFunctions(response.data);
+        setFixedFunctions([
+          { id: "if", name: "If Then Else", type: "Primitive" },
+          {
+            id: "rand_gauss_0",
+            name: "Random Normal (0 Mean)",
+            type: "Terminal",
+          },
+        ]);
+        setSelectedFunctions([
+          { id: "if", name: "If Then Else", type: "Primitive" },
+          {
+            id: "rand_gauss_0",
+            name: "Random Normal (0 Mean)",
+            type: "Terminal",
+          },
+        ]);
+      })
+      .catch((error) => {
+        console.log("Error getting Primitives and Terminals", error);
+      });
+  };
+
+  const hasOptionsChanged = (): boolean => {
+    const areFunctionsEqual = (
+      a: { id: string; name: string; type: string }[],
+      b: { id: string; name: string; type: string }[]
+    ): boolean => {
+      if (a.length !== b.length) return false;
+      const aIds = a.map((f) => f.id).sort();
+      const bIds = b.map((f) => f.id).sort();
+      return aIds.every((id, i) => id === bIds[i]);
+    };
+
+    if (!options) return true;
+
+    return (
+      selectedCorrelation !== options.corrOpt ||
+      selectedDimensionalityReduction !== options.dimRedOpt ||
+      population !== options.popSize ||
+      generations !== options.genCount ||
+      treeDepth !== options.treeDepth ||
+      crossChance !== options.crossChance ||
+      mutationChance !== options.mutationChance ||
+      selectedLossFunction.id !== options.lossFunction.id ||
+      !areFunctionsEqual(selectedFunctions, options.functions)
+    );
+  };
+
+  const handleSaveOptions = () => {
+    setOptions({
+      corrOpt: selectedCorrelation,
+      dimRedOpt: selectedDimensionalityReduction,
+      popSize: population,
+      genCount: generations,
+      treeDepth: treeDepth,
+      crossChance: crossChance,
+      mutationChance: mutationChance,
+      lossFunction: selectedLossFunction,
+      functions: selectedFunctions,
+    });
+    enqueueSnackbar("Parameters saved successfully!", {
+      variant: "success",
+    });
+  };
+
   useEffect(() => {
     if (dataset) {
-      // Generate columns using dataset.columns for correct order
       const generatedColumns: GridColDef[] = dataset.columns.map(
         (columnName) => ({
           field: columnName,
@@ -77,12 +175,10 @@ const Parametrization = () => {
           width: 150,
           editable: false,
           sortable: false,
-          // Add cellClassName to style selected column
           cellClassName: (params) =>
             params.field === selectedColumn
               ? "parametrization__cell active"
               : "parametrization__cell",
-          // Add headerClassName to style selected column header
           headerClassName: (params) =>
             params.field === selectedColumn
               ? "parametrization__header active"
@@ -90,14 +186,12 @@ const Parametrization = () => {
         })
       );
 
-      // Generate rows with IDs, ensuring data follows the column order
       const generatedRows = dataset.data.map((row: any, index: number) => {
         const orderedRow: any = {
           id: index,
         };
-        // Ensure data follows the column order from dataset.columns
         dataset.columns.forEach((columnName) => {
-          orderedRow[columnName] = String(row[columnName]); // Convert all values to strings
+          orderedRow[columnName] = String(row[columnName]);
         });
         return orderedRow;
       });
@@ -106,6 +200,7 @@ const Parametrization = () => {
       setRows(generatedRows);
 
       getLossFunctions();
+      getFunctions();
     } else {
       const generatedColumns: GridColDef[] = [
         {
@@ -169,28 +264,13 @@ const Parametrization = () => {
       </div>
       <div className="parametrization__options">
         <Autocomplete
-          disabled={!dataset}
-          disablePortal
-          options={scalingOptions}
-          value={selectedScaling}
-          onChange={(e, value) => {
-            setSelectedScaling(value || "");
-          }}
-          renderInput={(params) => (
-            <TextField
-              helperText="Choose a method to scale the features"
-              {...params}
-              label="Scaling method"
-            />
-          )}
-        />
-        <Autocomplete
+          size="small"
           disabled={!dataset}
           disablePortal
           options={correlationOptions}
           value={selectedCorrelation}
           onChange={(e, value) => {
-            setSelectedCorrelation(value || "");
+            setSelectedCorrelation(value || "Spearman");
           }}
           renderInput={(params) => (
             <TextField
@@ -200,13 +280,15 @@ const Parametrization = () => {
             />
           )}
         />
+
         <Autocomplete
+          size="small"
           disabled={!dataset}
           disablePortal
           options={dimensionalityReductionOptions}
           value={selectedDimensionalityReduction}
           onChange={(e, value) => {
-            setSelectedDimensionalityReduction(value || "");
+            setSelectedDimensionalityReduction(value || "PCA");
           }}
           renderInput={(params) => (
             <TextField
@@ -216,7 +298,9 @@ const Parametrization = () => {
             />
           )}
         />
+
         <TextField
+          size="small"
           label="Population size"
           helperText="Population size for the training (1 - 1000)"
           type="number"
@@ -229,7 +313,9 @@ const Parametrization = () => {
             }
           }}
         />
+
         <TextField
+          size="small"
           label="Generations"
           helperText="Number of generations for the training (1 - 500)"
           type="number"
@@ -242,7 +328,9 @@ const Parametrization = () => {
             }
           }}
         />
+
         <TextField
+          size="small"
           label="Max Tree Depth"
           helperText="Maximum depth of mutated trees (1 - 25)"
           type="number"
@@ -255,7 +343,9 @@ const Parametrization = () => {
             }
           }}
         />
+
         <TextField
+          size="small"
           label="Crossing Chance"
           helperText="Chance of crossing individuals (0.01 - 1)"
           type="number"
@@ -269,7 +359,9 @@ const Parametrization = () => {
             }
           }}
         />
+
         <TextField
+          size="small"
           label="Mutation Chance"
           helperText="Chance of mutating genes (0.01 - 1)"
           type="number"
@@ -283,7 +375,9 @@ const Parametrization = () => {
             }
           }}
         />
+
         <Autocomplete
+          size="small"
           disabled={!dataset}
           disablePortal
           options={lossFunctions}
@@ -302,8 +396,68 @@ const Parametrization = () => {
             />
           )}
         />
-        <Button
+
+        <Autocomplete
+          className="parametrization__options__functions"
+          size="small"
+          multiple
           disabled={!dataset}
+          disableCloseOnSelect
+          limitTags={2}
+          value={selectedFunctions}
+          groupBy={(option) => option.type}
+          onChange={(event, newValue) => {
+            setSelectedFunctions([
+              ...fixedFunctions,
+              ...newValue.filter(
+                (option) => !fixedFunctions.map((f) => f.id).includes(option.id)
+              ),
+            ]);
+          }}
+          options={functions}
+          getOptionLabel={(option) => option.name}
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          renderOption={(props, option, { selected }) => {
+            const isFixed = fixedFunctions.some((f) => f.id === option.id);
+            return (
+              <li {...props}>
+                <Checkbox
+                  style={{ padding: 0, marginLeft: -20, marginRight: 5 }}
+                  checked={selected || isFixed}
+                  disabled={isFixed}
+                />
+                <span>{option.name}</span>
+              </li>
+            );
+          }}
+          renderValue={(tagValue, getTagProps) =>
+            tagValue.map((option, index) => {
+              const isFixed = fixedFunctions.some((f) => f.id === option.id);
+              return index < 2 ? (
+                <Chip
+                  {...getTagProps({ index })}
+                  key={option.id}
+                  label={option.name}
+                  disabled={isFixed}
+                />
+              ) : (
+                <></>
+              );
+            })
+          }
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Primitives and Terminals"
+              placeholder="Selected"
+              helperText="Choose which Primitives and Terminals to use in the training"
+            />
+          )}
+        />
+
+        <Button
+          onClick={handleSaveOptions}
+          disabled={!dataset || !hasOptionsChanged()}
           variant="contained"
           className="parametrization__options__button"
         >

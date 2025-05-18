@@ -9,6 +9,7 @@ import { FaAngleRight } from "react-icons/fa";
 import { api } from "../../User/api";
 import Loader from "../Loader/Loader";
 import { DatasetContext } from "../../Data/dataContext";
+import { useNavigate } from "react-router-dom";
 
 const Data = () => {
   const MAX_SIZE = 50000000; // 50MB
@@ -38,6 +39,7 @@ const Data = () => {
     disabled: isFileSelected,
   });
   const { dataset, setDataset } = useContext(DatasetContext);
+  const navigate = useNavigate();
 
   const files = acceptedFiles.map((file) => (
     <div key={file.path}>
@@ -124,6 +126,7 @@ const Data = () => {
           variant: "success",
         });
         setIsLoading(false);
+        navigate("/train/parametrization");
       })
       .catch(() => {
         enqueueSnackbar("Error selecting dataset!", { variant: "error" });
