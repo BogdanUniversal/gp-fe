@@ -21,10 +21,11 @@ import Data from "./components/Train/Data";
 import { UserContext } from "./User/userContext";
 import Loader from "./components/Loader/Loader";
 import Parametrization from "./components/Train/Parametrization";
+import Evolution from "./components/Train/Evolution";
 
 function App() {
   const [user, setUser] = useState<User | null | undefined>(undefined);
-  
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -112,6 +113,14 @@ function App() {
               element: (
                 <ProtectedRoute>
                   <Parametrization />
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: "train",
+              element: (
+                <ProtectedRoute>
+                  <Evolution />
                 </ProtectedRoute>
               ),
             },

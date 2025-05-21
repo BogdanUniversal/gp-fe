@@ -5,32 +5,66 @@ import { DatasetContext } from "../../Data/dataContext";
 import { Autocomplete, Button, Checkbox, Chip, TextField } from "@mui/material";
 import { api } from "../../User/api";
 import { enqueueSnackbar } from "notistack";
+import { OptionsContext } from "../Options/optionsContext";
 
 const Parametrization = () => {
   const { dataset, setDataset } = useContext(DatasetContext);
+  const { options, setOptions } = useContext(OptionsContext);
   const [columns, setColumns] = useState<GridColDef[]>([]);
   const [rows, setRows] = useState<any[]>([]);
   const [selectedColumn, setSelectedColumn] = useState<string>(
-    dataset?.columns[dataset?.columns.length - 1] || ""
+    options.selectedLabel
   );
 
   const correlationOptions = ["Spearman", "Pearson", "Kendall"];
-  const [selectedCorrelation, setSelectedCorrelation] =
-    useState<string>("Pearson");
+  const [selectedCorrelation, setSelectedCorrelation] = useState<string>(
+    options.corrOpt
+  );
 
   const dimensionalityReductionOptions = ["PCA", "UMAP"];
   const [selectedDimensionalityReduction, setSelectedDimensionalityReduction] =
-    useState<string>("PCA");
+    useState<string>(options.dimRedOpt);
 
-  const [population, setPopulation] = useState<number>(50);
+  const [population, setPopulation] = useState<number>(options.popSize);
 
-  const [generations, setGenerations] = useState<number>(100);
+  const [generations, setGenerations] = useState<number>(options.genCount);
 
-  const [treeDepth, setTreeDepth] = useState<number>(10);
+  const [treeDepth, setTreeDepth] = useState<number>(options.treeDepth);
 
-  const [crossChance, setCrossChance] = useState<number>(0.5);
+  const [crossChance, setCrossChance] = useState<number>(options.crossChance);
 
-  const [mutationChance, setMutationChance] = useState<number>(0.2);
+  const mutationFunctions = [
+    { id: "mutUniform", name: "Uniform Mutation" },
+    { id: "mutEphemeral", name: "Ephemerals Mutation" },
+    { id: "mutSemantic", name: "Semantic Mutation" },
+    { id: "mutShrink", name: "Shrink Mutation" },
+    { id: "mutNodeReplacement", name: "Node Replacement" },
+    { id: "mutInsert", name: "Insert Mutation" },
+  ];
+  const [selectedMutationFunction, setSelectedMutationFunction] = useState<
+    {
+      id: string;
+      name: string;
+    }[]
+  >(options.mutationFunction);
+
+  const selectionMethods = [
+    { id: "tournament", name: "Tournament Selection" },
+    { id: "roulette", name: "Roulette Selection" },
+    { id: "best", name: "Best Selection" },
+    { id: "nsga2", name: "NSGA-II Selection" },
+    { id: "nsga3", name: "NSGA-III Selection" },
+    { id: "spea2", name: "SPEA-II Selection" },
+    { id: "lexicase", name: "Lexicase Selection" },
+  ];
+  const [selectedSelectionMethod, setSelectedSelectionMethod] = useState<{
+    id: string;
+    name: string;
+  }>(options.selectionMethod);
+
+  const [mutationChance, setMutationChance] = useState<number>(
+    options.mutationChance
+  );
 
   const [lossFunctions, setLossFunctions] = useState<
     { id: string; name: string }[]
@@ -38,7 +72,7 @@ const Parametrization = () => {
   const [selectedLossFunction, setSelectedLossFunction] = useState<{
     id: string;
     name: string;
-  }>({ id: "mse", name: "Mean Squared Error" });
+  }>(options.lossFunction);
 
   const [fixedFunctions, setFixedFunctions] = useState<
     { id: string; name: string; type: string }[]
@@ -48,36 +82,7 @@ const Parametrization = () => {
   >([{ id: "if", name: "If Then Else", type: "Float" }]);
   const [selectedFunctions, setSelectedFunctions] = useState<
     { id: string; name: string; type: string }[]
-  >([]);
-
-  const [options, setOptions] = useState<{
-    corrOpt: string;
-    dimRedOpt: string;
-    popSize: number;
-    genCount: number;
-    treeDepth: number;
-    crossChance: number;
-    mutationChance: number;
-    lossFunction: { id: string; name: string };
-    functions: { id: string; name: string; type: string }[];
-  }>({
-    corrOpt: "Pearson",
-    dimRedOpt: "PCA",
-    popSize: 50,
-    genCount: 100,
-    treeDepth: 10,
-    crossChance: 0.5,
-    mutationChance: 0.2,
-    lossFunction: { id: "mse", name: "Mean Squared Error" },
-    functions: [
-      { id: "if", name: "If Then Else", type: "Primitive" },
-      {
-        id: "rand_gauss_0",
-        name: "Random Normal (0 Mean)",
-        type: "Terminal",
-      },
-    ],
-  });
+  >(options.functions);
 
   const getLossFunctions = async () => {
     api
@@ -87,7 +92,13 @@ const Parametrization = () => {
       })
       .then((response) => {
         setLossFunctions(response.data);
-        setSelectedLossFunction(response.data[0]);
+        setSelectedLossFunction(
+          response.data
+            .map((f: { id: string; name: string }) => f.id)
+            .includes(options.lossFunction.id)
+            ? options.lossFunction
+            : response.data[0]
+        );
       })
       .catch((error) => {
         console.log("Error getting loss functions", error);
@@ -108,14 +119,6 @@ const Parametrization = () => {
             type: "Terminal",
           },
         ]);
-        setSelectedFunctions([
-          { id: "if", name: "If Then Else", type: "Primitive" },
-          {
-            id: "rand_gauss_0",
-            name: "Random Normal (0 Mean)",
-            type: "Terminal",
-          },
-        ]);
       })
       .catch((error) => {
         console.log("Error getting Primitives and Terminals", error);
@@ -123,25 +126,28 @@ const Parametrization = () => {
   };
 
   const hasOptionsChanged = (): boolean => {
-    const areFunctionsEqual = (
-      a: { id: string; name: string; type: string }[],
-      b: { id: string; name: string; type: string }[]
-    ): boolean => {
-      if (a.length !== b.length) return false;
-      const aIds = a.map((f) => f.id).sort();
-      const bIds = b.map((f) => f.id).sort();
-      return aIds.every((id, i) => id === bIds[i]);
-    };
+    const areFunctionsEqual = <T extends { id: string; name: string }>(
+        a: T[],
+        b: T[]
+      ): boolean => {
+        if (a.length !== b.length) return false;
+        const aIds = a.map((f) => f.id).sort();
+        const bIds = b.map((f) => f.id).sort();
+        return aIds.every((id, i) => id === bIds[i]);
+      };
 
     if (!options) return true;
 
     return (
+      selectedColumn !== options.selectedLabel ||
       selectedCorrelation !== options.corrOpt ||
       selectedDimensionalityReduction !== options.dimRedOpt ||
       population !== options.popSize ||
       generations !== options.genCount ||
       treeDepth !== options.treeDepth ||
       crossChance !== options.crossChance ||
+      !areFunctionsEqual(selectedMutationFunction, options.mutationFunction) ||
+      selectedSelectionMethod.id !== options.selectionMethod.id ||
       mutationChance !== options.mutationChance ||
       selectedLossFunction.id !== options.lossFunction.id ||
       !areFunctionsEqual(selectedFunctions, options.functions)
@@ -150,6 +156,7 @@ const Parametrization = () => {
 
   const handleSaveOptions = () => {
     setOptions({
+      selectedLabel: selectedColumn,
       corrOpt: selectedCorrelation,
       dimRedOpt: selectedDimensionalityReduction,
       popSize: population,
@@ -157,12 +164,39 @@ const Parametrization = () => {
       treeDepth: treeDepth,
       crossChance: crossChance,
       mutationChance: mutationChance,
+      mutationFunction: selectedMutationFunction,
+      selectionMethod: selectedSelectionMethod,
       lossFunction: selectedLossFunction,
       functions: selectedFunctions,
     });
-    enqueueSnackbar("Parameters saved successfully!", {
-      variant: "success",
-    });
+    api
+      .post(
+        "/models/set_parameters",
+        {
+          selectedLabel: selectedColumn,
+          corrOpt: selectedCorrelation,
+          dimRedOpt: selectedDimensionalityReduction,
+          popSize: population,
+          genCount: generations,
+          treeDepth: treeDepth,
+          crossChance: crossChance,
+          mutationChance: mutationChance,
+          mutationFunction: selectedMutationFunction,
+          selectionMethod: selectedSelectionMethod,
+          lossFunction: selectedLossFunction,
+          functions: selectedFunctions,
+        },
+        { withCredentials: true }
+      )
+      .then((response) => {
+        enqueueSnackbar("Parameters saved successfully!", {
+          variant: "success",
+        });
+      })
+      .catch((error) => {
+        console.log("Error saving parameters", error);
+        enqueueSnackbar("Error saving parameters", { variant: "error" });
+      });
   };
 
   useEffect(() => {
@@ -266,6 +300,7 @@ const Parametrization = () => {
         <Autocomplete
           size="small"
           disabled={!dataset}
+          disableClearable
           disablePortal
           options={correlationOptions}
           value={selectedCorrelation}
@@ -285,6 +320,7 @@ const Parametrization = () => {
           size="small"
           disabled={!dataset}
           disablePortal
+          disableClearable
           options={dimensionalityReductionOptions}
           value={selectedDimensionalityReduction}
           onChange={(e, value) => {
@@ -308,7 +344,7 @@ const Parametrization = () => {
           disabled={!dataset}
           onChange={(e) => {
             const value = parseInt(e.target.value);
-            if (!isNaN(value) && value > 0 && value <= 100) {
+            if (!isNaN(value) && value > 0 && value <= 1000) {
               setPopulation(value);
             }
           }}
@@ -377,8 +413,80 @@ const Parametrization = () => {
         />
 
         <Autocomplete
+          className="parametrization__options__mutation"
+          size="small"
+          multiple
+          disabled={!dataset}
+          disableClearable
+          disableCloseOnSelect
+          limitTags={1}
+          value={selectedMutationFunction}
+          onChange={(event, newValue) => {
+            if (newValue.length > 0) setSelectedMutationFunction(newValue);
+          }}
+          options={mutationFunctions}
+          getOptionLabel={(option) => option.name}
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          renderOption={(props, option, { selected }) => {
+            return (
+              <li {...props}>
+                <Checkbox
+                  style={{ padding: 0, marginLeft: -10, marginRight: 5 }}
+                  checked={selected}
+                />
+                <span>{option.name}</span>
+              </li>
+            );
+          }}
+          renderValue={(tagValue, getTagProps) =>
+            tagValue.map((option, index) => {
+              return index < 1 ? (
+                <Chip
+                  {...getTagProps({ index })}
+                  key={option.id}
+                  label={option.name}
+                />
+              ) : (
+                <></>
+              );
+            })
+          }
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Mutation function"
+              placeholder="Selected"
+              helperText="Choose which mutation functions to use in the training"
+            />
+          )}
+        />
+
+        <Autocomplete
           size="small"
           disabled={!dataset}
+          disableClearable
+          disablePortal
+          options={selectionMethods}
+          value={selectedSelectionMethod}
+          getOptionLabel={(option) => option.name}
+          onChange={(e, value) => {
+            if (value) {
+              setSelectedSelectionMethod(value);
+            }
+          }}
+          renderInput={(params) => (
+            <TextField
+              helperText="Choose which selection method to use"
+              {...params}
+              label="Selection method"
+            />
+          )}
+        />
+
+        <Autocomplete
+          size="small"
+          disabled={!dataset}
+          disableClearable
           disablePortal
           options={lossFunctions}
           value={selectedLossFunction}

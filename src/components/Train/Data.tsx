@@ -10,6 +10,7 @@ import { api } from "../../User/api";
 import Loader from "../Loader/Loader";
 import { DatasetContext } from "../../Data/dataContext";
 import { useNavigate } from "react-router-dom";
+import { OptionsContext } from "../Options/optionsContext";
 
 const Data = () => {
   const MAX_SIZE = 50000000; // 50MB
@@ -39,6 +40,7 @@ const Data = () => {
     disabled: isFileSelected,
   });
   const { dataset, setDataset } = useContext(DatasetContext);
+  const { options, setOptions } = useContext(OptionsContext);
   const navigate = useNavigate();
 
   const files = acceptedFiles.map((file) => (
@@ -122,6 +124,28 @@ const Data = () => {
           totalRows: response.data.dataset.total_rows,
           totalColumns: response.data.dataset.total_columns,
         });
+        setOptions({
+          selectedLabel:
+            response.data.dataset.columns[response.data.dataset.columns.length - 1],
+          corrOpt: "Spearman",
+          dimRedOpt: "PCA",
+          popSize: 50,
+          genCount: 100,
+          treeDepth: 10,
+          crossChance: 0.5,
+          mutationChance: 0.2,
+          mutationFunction: [{ id: "mutUniform", name: "Uniform Mutation" }],
+          selectionMethod: { id: "tournament", name: "Tournament Selection" },
+          lossFunction: { id: "mse", name: "Mean Squared Error" },
+          functions: [
+            { id: "if", name: "If Then Else", type: "Primitive" },
+            {
+              id: "rand_gauss_0",
+              name: "Random Normal (0 Mean)",
+              type: "Terminal",
+            },
+          ],
+        });
         enqueueSnackbar("Dataset selected!", {
           variant: "success",
         });
@@ -150,7 +174,11 @@ const Data = () => {
             previousFiles.map((file) => (
               <div
                 key={file.id}
-                className={file.id === dataset?.id ? "data__previous__files__file active" : "data__previous__files__file"}
+                className={
+                  file.id === dataset?.id
+                    ? "data__previous__files__file active"
+                    : "data__previous__files__file"
+                }
                 onClick={() => handleSelectDataset(file.id)}
               >
                 <FaFileCsv className="data__previous__files__file__icon" />{" "}
