@@ -12,9 +12,13 @@ const Parametrization = () => {
   const { options, setOptions } = useContext(OptionsContext);
   const [columns, setColumns] = useState<GridColDef[]>([]);
   const [rows, setRows] = useState<any[]>([]);
-  const [selectedColumn, setSelectedColumn] = useState<string>(
+  const [selectedLabel, setSelectedLabel] = useState<string>(
     options.selectedLabel
   );
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>(
+    options.selectedFeatures
+  );
+  const [clickTimeout, setClickTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const correlationOptions = ["Spearman", "Pearson", "Kendall"];
   const [selectedCorrelation, setSelectedCorrelation] = useState<string>(
@@ -36,7 +40,6 @@ const Parametrization = () => {
   const mutationFunctions = [
     { id: "mutUniform", name: "Uniform Mutation" },
     { id: "mutEphemeral", name: "Ephemerals Mutation" },
-    { id: "mutSemantic", name: "Semantic Mutation" },
     { id: "mutShrink", name: "Shrink Mutation" },
     { id: "mutNodeReplacement", name: "Node Replacement" },
     { id: "mutInsert", name: "Insert Mutation" },
@@ -53,7 +56,6 @@ const Parametrization = () => {
     { id: "roulette", name: "Roulette Selection" },
     { id: "best", name: "Best Selection" },
     { id: "nsga2", name: "NSGA-II Selection" },
-    { id: "nsga3", name: "NSGA-III Selection" },
     { id: "spea2", name: "SPEA-II Selection" },
     { id: "lexicase", name: "Lexicase Selection" },
   ];
@@ -66,13 +68,10 @@ const Parametrization = () => {
     options.mutationChance
   );
 
-  const [lossFunctions, setLossFunctions] = useState<
-    { id: string; name: string }[]
-  >([{ id: "mse", name: "Mean Squared Error" }]);
-  const [selectedLossFunction, setSelectedLossFunction] = useState<{
-    id: string;
-    name: string;
-  }>(options.lossFunction);
+  const objectives = ["Classification", "Regression"];
+  const [selectedObjective, setSelectedObjective] = useState<string>(
+    options.objective
+  );
 
   const [fixedFunctions, setFixedFunctions] = useState<
     { id: string; name: string; type: string }[]
@@ -84,32 +83,10 @@ const Parametrization = () => {
     { id: string; name: string; type: string }[]
   >(options.functions);
 
-  const getLossFunctions = async () => {
-    api
-      .get("/models/get_loss_functions", {
-        params: { label: selectedColumn },
-        withCredentials: true,
-      })
-      .then((response) => {
-        setLossFunctions(response.data);
-        setSelectedLossFunction(
-          response.data
-            .map((f: { id: string; name: string }) => f.id)
-            .includes(options.lossFunction.id)
-            ? options.lossFunction
-            : response.data[0]
-        );
-      })
-      .catch((error) => {
-        console.log("Error getting loss functions", error);
-      });
-  };
-
   const getFunctions = async () => {
     api
       .get("/models/get_terminals_primitives", { withCredentials: true })
       .then((response) => {
-        console.log("Functions and Primitives", response.data);
         setFunctions(response.data);
         setFixedFunctions([
           { id: "if", name: "If Then Else", type: "Primitive" },
@@ -127,19 +104,27 @@ const Parametrization = () => {
 
   const hasOptionsChanged = (): boolean => {
     const areFunctionsEqual = <T extends { id: string; name: string }>(
-        a: T[],
-        b: T[]
-      ): boolean => {
-        if (a.length !== b.length) return false;
-        const aIds = a.map((f) => f.id).sort();
-        const bIds = b.map((f) => f.id).sort();
-        return aIds.every((id, i) => id === bIds[i]);
-      };
+      a: T[],
+      b: T[]
+    ): boolean => {
+      if (a.length !== b.length) return false;
+      const aIds = a.map((f) => f.id).sort();
+      const bIds = b.map((f) => f.id).sort();
+      return aIds.every((id, i) => id === bIds[i]);
+    };
+
+    const areArraysEqual = (a: string[], b: string[]): boolean => {
+      if (a.length !== b.length) return false;
+      const sortedA = [...a].sort();
+      const sortedB = [...b].sort();
+      return sortedA.every((val, idx) => val === sortedB[idx]);
+    };
 
     if (!options) return true;
 
     return (
-      selectedColumn !== options.selectedLabel ||
+      !areArraysEqual(selectedFeatures, options.selectedFeatures) ||
+      selectedLabel !== options.selectedLabel ||
       selectedCorrelation !== options.corrOpt ||
       selectedDimensionalityReduction !== options.dimRedOpt ||
       population !== options.popSize ||
@@ -149,14 +134,15 @@ const Parametrization = () => {
       !areFunctionsEqual(selectedMutationFunction, options.mutationFunction) ||
       selectedSelectionMethod.id !== options.selectionMethod.id ||
       mutationChance !== options.mutationChance ||
-      selectedLossFunction.id !== options.lossFunction.id ||
+      selectedObjective !== options.objective ||
       !areFunctionsEqual(selectedFunctions, options.functions)
     );
   };
 
   const handleSaveOptions = () => {
     setOptions({
-      selectedLabel: selectedColumn,
+      selectedFeatures: selectedFeatures,
+      selectedLabel: selectedLabel,
       corrOpt: selectedCorrelation,
       dimRedOpt: selectedDimensionalityReduction,
       popSize: population,
@@ -166,14 +152,15 @@ const Parametrization = () => {
       mutationChance: mutationChance,
       mutationFunction: selectedMutationFunction,
       selectionMethod: selectedSelectionMethod,
-      lossFunction: selectedLossFunction,
+      objective: selectedObjective,
       functions: selectedFunctions,
     });
     api
       .post(
         "/models/set_parameters",
         {
-          selectedLabel: selectedColumn,
+          selectedFeatures: selectedFeatures,
+          selectedLabel: selectedLabel,
           corrOpt: selectedCorrelation,
           dimRedOpt: selectedDimensionalityReduction,
           popSize: population,
@@ -183,7 +170,7 @@ const Parametrization = () => {
           mutationChance: mutationChance,
           mutationFunction: selectedMutationFunction,
           selectionMethod: selectedSelectionMethod,
-          lossFunction: selectedLossFunction,
+          objective: selectedObjective,
           functions: selectedFunctions,
         },
         { withCredentials: true }
@@ -205,18 +192,28 @@ const Parametrization = () => {
         (columnName) => ({
           field: columnName,
           headerName: columnName.charAt(0).toUpperCase() + columnName.slice(1),
-          description: `Select "${columnName}" as label`,
+          description: `Click to select "${columnName}" as feature / double-click for label.`,
           width: 150,
           editable: false,
           sortable: false,
-          cellClassName: (params) =>
-            params.field === selectedColumn
-              ? "parametrization__cell active"
-              : "parametrization__cell",
-          headerClassName: (params) =>
-            params.field === selectedColumn
-              ? "parametrization__header active"
-              : "parametrization__header",
+          cellClassName: (params) => {
+            if (params.field === selectedLabel) {
+              return "parametrization__cell label";
+            } else if (selectedFeatures.includes(params.field)) {
+              return "parametrization__cell feature";
+            } else {
+              return "parametrization__cell";
+            }
+          },
+          headerClassName: (params) => {
+            if (params.field === selectedLabel) {
+              return "parametrization__header label";
+            } else if (selectedFeatures.includes(params.field)) {
+              return "parametrization__header feature";
+            } else {
+              return "parametrization__header";
+            }
+          },
         })
       );
 
@@ -233,8 +230,7 @@ const Parametrization = () => {
       setColumns(generatedColumns);
       setRows(generatedRows);
 
-      getLossFunctions();
-      getFunctions();
+      // getFunctions();
     } else {
       const generatedColumns: GridColDef[] = [
         {
@@ -256,7 +252,11 @@ const Parametrization = () => {
       setColumns(generatedColumns);
       setRows(generatedRows);
     }
-  }, [dataset, selectedColumn]);
+  }, [dataset, selectedFeatures, selectedLabel]);
+
+  useEffect(() => {
+    getFunctions();
+  }, []);
 
   return (
     <div className="parametrization">
@@ -275,8 +275,50 @@ const Parametrization = () => {
           }}
           rowHeight={35}
           showToolbar={dataset ? true : false}
-          onColumnHeaderClick={(params) => {
-            setSelectedColumn(params.field);
+          onColumnHeaderClick={(params, event) => {
+            if (clickTimeout) clearTimeout(clickTimeout);
+            const timeout = setTimeout(() => {
+              setSelectedFeatures((prev) => {
+                const newFeatures = [...prev];
+                if (params.field === selectedLabel) {
+                  return prev;
+                }
+                if (newFeatures.includes(params.field)) {
+                  newFeatures.splice(newFeatures.indexOf(params.field), 1);
+                } else {
+                  newFeatures.push(params.field);
+                }
+                if (newFeatures.length === 0) {
+                  enqueueSnackbar("Please select at least one feature.", {
+                    variant: "warning",
+                  });
+                  return [params.field];
+                }
+                return newFeatures;
+              });
+              setClickTimeout(null);
+            }, 300);
+
+            setClickTimeout(timeout);
+          }}
+          onColumnHeaderDoubleClick={(params) => {
+            if (clickTimeout) {
+              clearTimeout(clickTimeout);
+              setClickTimeout(null);
+            }
+            if (
+              selectedFeatures.length === 1 &&
+              selectedFeatures[0] === params.field
+            ) {
+              enqueueSnackbar("Please select at least one feature.", {
+                variant: "warning",
+              });
+            } else {
+              setSelectedLabel(params.field);
+              setSelectedFeatures((prev) => {
+                return prev.filter((feature) => feature !== params.field);
+              });
+            }
           }}
           disableRowSelectionOnClick
           slots={{
@@ -286,7 +328,7 @@ const Parametrization = () => {
                   <div className="parametrization__footer__child">
                     Selected label:{" "}
                     <div className="parametrization__footer__label">
-                      {selectedColumn}
+                      {selectedLabel}
                     </div>
                   </div>
                   <GridFooter />
@@ -488,19 +530,19 @@ const Parametrization = () => {
           disabled={!dataset}
           disableClearable
           disablePortal
-          options={lossFunctions}
-          value={selectedLossFunction}
-          getOptionLabel={(option) => option.name}
+          options={objectives}
+          value={selectedObjective}
+          getOptionLabel={(option) => option}
           onChange={(e, value) => {
             if (value) {
-              setSelectedLossFunction(value);
+              setSelectedObjective(value);
             }
           }}
           renderInput={(params) => (
             <TextField
-              helperText="Choose which loss function to use"
+              helperText="Choose the objective of the model"
               {...params}
-              label="Loss function"
+              label="Objective"
             />
           )}
         />

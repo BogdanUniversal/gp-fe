@@ -10,6 +10,7 @@ import { Options, OptionsContext } from "../Options/optionsContext";
 const Train = () => {
   const [dataset, setDataset] = useState<Dataset | null>(null);
   const [options, setOptions] = useState<Options>({
+    selectedFeatures: [],
     selectedLabel: "",
     corrOpt: "Spearman",
     dimRedOpt: "PCA",
@@ -20,7 +21,7 @@ const Train = () => {
     mutationChance: 0.2,
     mutationFunction: [{ id: "mutUniform", name: "Uniform Mutation" }],
     selectionMethod: { id: "tournament", name: "Tournament Selection" },
-    lossFunction: { id: "mse", name: "Mean Squared Error" },
+    objective: "Classification",
     functions: [
       { id: "if", name: "If Then Else", type: "Primitive" },
       {

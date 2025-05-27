@@ -125,6 +125,7 @@ const Data = () => {
           totalColumns: response.data.dataset.total_columns,
         });
         setOptions({
+          selectedFeatures: response.data.dataset.columns.slice(0, -1),
           selectedLabel:
             response.data.dataset.columns[response.data.dataset.columns.length - 1],
           corrOpt: "Spearman",
@@ -136,7 +137,7 @@ const Data = () => {
           mutationChance: 0.2,
           mutationFunction: [{ id: "mutUniform", name: "Uniform Mutation" }],
           selectionMethod: { id: "tournament", name: "Tournament Selection" },
-          lossFunction: { id: "mse", name: "Mean Squared Error" },
+          objective: "Classification",
           functions: [
             { id: "if", name: "If Then Else", type: "Primitive" },
             {

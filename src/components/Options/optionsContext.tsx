@@ -3,6 +3,7 @@
 import { createContext, Dispatch, SetStateAction } from "react";
 
 export interface Options {
+  selectedFeatures: string[];
   selectedLabel: string;
   corrOpt: string;
   dimRedOpt: string;
@@ -13,7 +14,7 @@ export interface Options {
   mutationChance: number;
   mutationFunction: { id: string; name: string }[];
   selectionMethod: { id: string; name: string };
-  lossFunction: { id: string; name: string };
+  objective: string;
   functions: { id: string; name: string; type: string }[];
 }
 
@@ -24,6 +25,7 @@ interface OptionsContext {
 
 export const OptionsContext = createContext<OptionsContext>({
   options: {
+    selectedFeatures: [],
     selectedLabel: "",
     corrOpt: "Spearman",
     dimRedOpt: "PCA",
@@ -34,7 +36,7 @@ export const OptionsContext = createContext<OptionsContext>({
     mutationChance: 0.2,
     mutationFunction: [{ id: "mutUniform", name: "Uniform Mutation" }],
     selectionMethod: { id: "tournament", name: "Tournament Selection" },
-    lossFunction: { id: "mse", name: "Mean Squared Error" },
+    objective: "Classification",
     functions: [
       { id: "if", name: "If Then Else", type: "Primitive" },
       {
