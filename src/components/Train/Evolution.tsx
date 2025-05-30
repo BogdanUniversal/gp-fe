@@ -1,27 +1,35 @@
-import { Button } from "@mui/material";
-import { SetStateAction, useContext, useState } from "react";
+import { Button, TextField } from "@mui/material";
+import { SetStateAction, useContext, useEffect, useState } from "react";
 import { DatasetContext } from "../../Data/dataContext";
 import { OptionsContext } from "../Options/optionsContext";
 import { api } from "../../User/api";
 import { io } from "socket.io-client";
 import {
   CartesianGrid,
+  Label,
   Legend,
   Line,
   LineChart,
   ResponsiveContainer,
+  Text,
   Tooltip,
   XAxis,
   YAxis,
-  Text,
 } from "recharts";
+import Loader from "../Loader/Loader";
 
 const Evolution = () => {
   const { dataset } = useContext(DatasetContext);
   const { options } = useContext(OptionsContext);
+  const [modelName, setModelName] = useState<string>("GP Model");
   const [trainData, setTrainData] = useState<any[]>([]);
+  const [preprocessing, setPreprocessing] = useState<boolean>(false);
+  const [itsTraining, setItsTraining] = useState<boolean>(false);
 
   const handleTrainModel = async () => {
+    setTrainData([]);
+    setItsTraining(true);
+    setPreprocessing(true);
     const csrf_cookie = document.cookie
       .split("; ")
       .find((row) => row.startsWith("csrf_access_token="));
@@ -37,13 +45,25 @@ const Evolution = () => {
     });
 
     socket.on("connect", () => {
-      console.log("Socket connected successfully");
-      setTrainData([]); // Clear previous training data
+      setTrainData([]);
     });
 
     socket.on("training_update", (data) => {
-      // console.log("Received update:", data);
-      setTrainData((prevData) => [...prevData, data]);
+      setPreprocessing(false);
+      setTrainData((prevData) => {
+        const generationExists = prevData.some(
+          (item) => item.generation === data.generation
+        );
+
+        if (generationExists) {
+          return prevData.map((item) =>
+            item.generation === data.generation ? data : item
+          );
+        } else {
+          return [...prevData, data];
+        }
+      });
+      if (data.generation === options.genCount) setItsTraining(false);
     });
 
     await api
@@ -56,73 +76,35 @@ const Evolution = () => {
       });
   };
 
-  const data = [
-    {
-      name: "Page A",
-      uv: 4000,
-      pv: 2400,
-      amt: 2400,
-    },
-    {
-      name: "Page B",
-      uv: 3000,
-      pv: 1398,
-      amt: 2210,
-    },
-    {
-      name: "Page C",
-      uv: 2000,
-      pv: 9800,
-      amt: 2290,
-    },
-    {
-      name: "Page D",
-      uv: 2780,
-      pv: 3908,
-      amt: 2000,
-    },
-    {
-      name: "Page E",
-      uv: 1890,
-      pv: 4800,
-      amt: 2181,
-    },
-    {
-      name: "Page F",
-      uv: 2390,
-      pv: 3800,
-      amt: 2500,
-    },
-    {
-      name: "Page G",
-      uv: 3490,
-      pv: 4300,
-      amt: 2100,
-    },
-  ];
-
   return (
-    <div className="flex flex-col items-center justify-center h-full">
-      <h1 className="text-2xl font-bold mb-4">Evolution</h1>
-      <p className="text-gray-600">This feature is under development.</p>
+    <div className="evolution">
+      <TextField
+        label="Current model"
+        helperText="What should the current model be named?"
+        value={modelName}
+        onChange={(e) => setModelName(e.target.value)}
+        disabled={!dataset || !options || itsTraining}
+        fullWidth
+      />
       <Button
-        disabled={!dataset || !options}
+        disabled={!dataset || !options || itsTraining}
         onClick={handleTrainModel}
         variant="contained"
       >
         Begin Training!
       </Button>
 
-      {trainData.length > 0 ? (
+      <ResponsiveContainer width="100%" height={270}>
         <LineChart
           width={730}
           height={250}
-          data={trainData}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          data={trainData.length > 0 ? trainData : [{}]}
         >
           <CartesianGrid strokeDasharray="1 5" />
           <XAxis
             dataKey="generation"
+            name="Generation"
+            type="category"
             label={{
               value: "Generation",
               position: "insideBottom",
@@ -153,24 +135,47 @@ const Evolution = () => {
           />
           <Tooltip />
           <Legend verticalAlign="top" />
-          <Line
-            yAxisId="left"
-            type="monotone"
-            dataKey="best_fitness"
-            stroke="#8884d8"
-            dot={false}
-          />
-          <Line
-            yAxisId="right"
-            type="monotone"
-            dataKey="avg_fitness"
-            stroke="#82ca9d"
-            dot={false}
-          />
+
+          {trainData.length > 0 ? (
+            <>
+              <Line
+                yAxisId="left"
+                type="monotone"
+                dataKey="best_fitness"
+                name="Best Fitness"
+                stroke="#8884d8"
+                dot={false}
+              />
+              <Line
+                yAxisId="right"
+                type="monotone"
+                dataKey="avg_fitness"
+                name="Average Fitness"
+                stroke="#82ca9d"
+                dot={false}
+              />
+            </>
+          ) : preprocessing ? (
+            <g>
+              <text
+                x="50%"
+                y="40%"
+                textAnchor="middle"
+                dominantBaseline="middle"
+              >
+                Preprocessing
+              </text>
+              <foreignObject x="40%" y="45%" width="20%" height="60">
+                <Loader color="#4a4a4a" />
+              </foreignObject>
+            </g>
+          ) : (
+            <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle">
+              Begin training to see the evolution of the model!
+            </text>
+          )}
         </LineChart>
-      ) : (
-        <p className="text-gray-600">No training data available.</p>
-      )}
+      </ResponsiveContainer>
     </div>
   );
 };

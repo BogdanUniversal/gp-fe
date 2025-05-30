@@ -5,14 +5,10 @@ import { BiExpand } from "react-icons/bi";
 import { BiCollapse } from "react-icons/bi";
 import TreeViewNode from "./TreeViewNode";
 import { Tooltip } from "@mui/material";
+import { useDocumentation } from '../View/View';
 
-const TreeView = ({
-  handleMouseEnter,
-  handleMouseLeave,
-}: {
-  handleMouseEnter: () => void;
-  handleMouseLeave: () => void;
-}) => {
+const TreeView = () => {
+  const { handleMouseEnter, handleMouseLeave } = useDocumentation();
   const orgChart = {
     name: "for",
     children: [

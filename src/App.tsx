@@ -22,6 +22,10 @@ import { UserContext } from "./User/userContext";
 import Loader from "./components/Loader/Loader";
 import Parametrization from "./components/Train/Parametrization";
 import Evolution from "./components/Train/Evolution";
+import TreeView from "./components/View/TreeView";
+import CodeView from "./components/View/CodeView";
+import ViewHome from "./components/View/ViewHome";
+import Models from "./components/View/Models";
 
 function App() {
   const [user, setUser] = useState<User | null | undefined>(undefined);
@@ -133,6 +137,48 @@ function App() {
               <View />
             </ProtectedRoute>
           ),
+          children: [
+            {
+              path: "",
+              element: (
+                <ProtectedRoute>
+                  <ViewHome />
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: "model",
+              element: (
+                <ProtectedRoute>
+                  <Models />
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: "performance",
+              element: (
+                <ProtectedRoute>
+                  <Parametrization />
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: "tree",
+              element: (
+                <ProtectedRoute>
+                  <TreeView />
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: "code",
+              element: (
+                <ProtectedRoute>
+                  <CodeView />
+                </ProtectedRoute>
+              ),
+            },
+          ],
         },
         {
           path: "/signup",

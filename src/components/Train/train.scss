@@ -48,6 +48,11 @@
   justify-content: center;
   gap: 2em;
 
+  &__title {
+    color: whitesmoke;
+    margin-bottom: 2em;
+  }
+
   &__container {
     height: 80%;
     display: flex;
@@ -378,4 +383,20 @@
       height: 4em;
     }
   }
+}
+
+
+.evolution {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  margin-top: 2em;
+  width: 70%;
+  height: 70%;
+  gap: 2em;
+  background-color: whitesmoke;
+  padding: 2em;
+  border-radius: 10px;
 }

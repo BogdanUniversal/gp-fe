@@ -8,6 +8,7 @@ import { NavLink } from "react-router-dom";
 const Steps = () => {
   return (
     <div className="steps__container">
+      <h1 className="steps__title">Dataset Selection & Model Training</h1>
       <div className="steps">
         <NavLink to={"/train/data"} className="steps__step">
           <div className="steps__step__icon">

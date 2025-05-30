@@ -1,10 +1,12 @@
 import "./view.css";
 import { createContext, useContext, useRef, useState } from "react";
-import Select from "react-select";
-import TreeView from "./TreeView";
-import CodeView from "./CodeView";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { a11yDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { NavLink, Outlet } from "react-router-dom";
+import { ImTree } from "react-icons/im";
+import { TbBrandPython } from "react-icons/tb";
+import { TbBoxModel2 } from "react-icons/tb";
+import { IoStatsChartSharp } from "react-icons/io5";
 
 const DocumentationContext = createContext<DocumentationProps | undefined>(
   undefined
@@ -21,11 +23,11 @@ export const useDocumentation = (): DocumentationProps => {
 };
 
 const View = () => {
-  const viewOptions = [
-    { value: "tree", label: "Tree" },
-    { value: "algorithm", label: "Algorithm" },
-  ];
-  const [view, setView] = useState({ value: "tree", label: "Tree" });
+  // const viewOptions = [
+  //   { value: "tree", label: "Tree" },
+  //   { value: "algorithm", label: "Algorithm" },
+  // ];
+  // const [view, setView] = useState({ value: "tree", label: "Tree" });
 
   const [documentation, setDocumentation] = useState<DocumentationState>({
     show: false,
@@ -129,47 +131,53 @@ def lcm(a, b):
     }, 700);
   };
 
-
   return (
-    <DocumentationContext.Provider value={{ documentation, setDocumentation }}>
+    <DocumentationContext.Provider
+      value={{
+        documentation,
+        setDocumentation,
+        handleMouseEnter,
+        handleMouseLeave,
+      }}
+    >
+      <div
+        className="view"
+        onMouseMove={(e) => {
+          const left = e.currentTarget.getBoundingClientRect().right;
+          if (!documentation.show)
+            setDocumentationPos({ x: left - e.clientX, y: e.clientY });
+        }}
+      >
         <div
-          className="view"
-          onMouseMove={(e) => {
-            const left = e.currentTarget.getBoundingClientRect().right;
-            if (!documentation.show)
-              setDocumentationPos({ x: left - e.clientX, y: e.clientY });
+          className={
+            documentation.show
+              ? "view__documentation active"
+              : "view__documentation"
+          }
+          style={{
+            right: documentationPos.x - 260,
+            top: documentationPos.y - 240,
           }}
-        >
-          <div
-            className={
-              documentation.show
-                ? "view__documentation active"
-                : "view__documentation"
+          onMouseEnter={() => {
+            if (leaveTimeoutRef.current) {
+              clearTimeout(leaveTimeoutRef.current);
             }
-            style={{
-              right: documentationPos.x - 260,
-              top: documentationPos.y - 240,
-            }}
-            onMouseEnter={() => {
-              if (leaveTimeoutRef.current) {
-                clearTimeout(leaveTimeoutRef.current);
-              }
-              setDocumentation((prev) => {
-                return { ...prev, show: true };
-              });
-            }}
-            onMouseLeave={handleMouseLeave}
+            setDocumentation((prev) => {
+              return { ...prev, show: true };
+            });
+          }}
+          onMouseLeave={handleMouseLeave}
+        >
+          <SyntaxHighlighter
+            className="view__documentation__syntax"
+            language="python"
+            style={a11yDark}
+            wrapLongLines={true}
           >
-            <SyntaxHighlighter
-              className="view__documentation__syntax"
-              language="python"
-              style={a11yDark}
-              wrapLongLines={true}
-            >
-              {documentation.text}
-            </SyntaxHighlighter>
-          </div>
-          <div className="view__options">
+            {documentation.text}
+          </SyntaxHighlighter>
+        </div>
+        {/* <div className="view__options">
             <div className="view__options__select">
               View mode:
               <Select
@@ -193,9 +201,54 @@ def lcm(a, b):
             />
           ) : (
             <CodeView />
-          )}
-        </div>
+          )} */}
 
+        <div className="view__nav">
+          <div className="view__nav__steps">
+            <NavLink
+              className={({ isActive }) => {
+                return isActive
+                  ? "view__nav__steps__option active"
+                  : "view__nav__steps__option";
+              }}
+              to={"/view/model"}
+            >
+              <TbBoxModel2 /> Model
+            </NavLink>
+            <NavLink
+              className={({ isActive }) => {
+                return isActive
+                  ? "view__nav__steps__option active"
+                  : "view__nav__steps__option";
+              }}
+              to={"/view/performance"}
+            >
+              <IoStatsChartSharp /> Performance
+            </NavLink>
+            <NavLink
+              className={({ isActive }) => {
+                return isActive
+                  ? "view__nav__steps__option active"
+                  : "view__nav__steps__option";
+              }}
+              to={"/view/tree"}
+            >
+              <ImTree /> Tree
+            </NavLink>
+            <NavLink
+              className={({ isActive }) => {
+                return isActive
+                  ? "view__nav__steps__option active"
+                  : "view__nav__steps__option";
+              }}
+              to={"/view/code"}
+            >
+              <TbBrandPython /> Code
+            </NavLink>
+          </div>
+          <Outlet />
+        </div>
+      </div>
     </DocumentationContext.Provider>
   );
 };
@@ -210,4 +263,6 @@ export interface DocumentationState {
 export interface DocumentationProps {
   documentation: DocumentationState;
   setDocumentation: React.Dispatch<React.SetStateAction<DocumentationState>>;
+  handleMouseEnter: () => void;
+  handleMouseLeave: () => void;
 }
