@@ -67,7 +67,11 @@ const Evolution = () => {
     });
 
     await api
-      .get("/models/train_model", { withCredentials: true })
+      .post(
+        "/models/train_model",
+        { model_name: modelName, dataset_id: dataset?.id },
+        { withCredentials: true }
+      )
       .then((response) => {
         console.log("Training started:", response.data);
       })

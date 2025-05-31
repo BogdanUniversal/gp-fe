@@ -5,7 +5,7 @@ const Models = () => {
   return (
     <div className="models">
       <div className="data__header">Select the dataset for training</div>
-      <div className="data__previous">
+      {/* <div className="data__previous">
         <div className="data__previous__header">Previous uploaded datasets</div>
         <div className="data__previous__files">
           {isLoading ? (
@@ -37,7 +37,7 @@ const Models = () => {
             </div>
           )}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
