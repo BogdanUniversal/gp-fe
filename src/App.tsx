@@ -26,6 +26,7 @@ import TreeView from "./components/View/TreeView";
 import CodeView from "./components/View/CodeView";
 import ViewHome from "./components/View/ViewHome";
 import Models from "./components/View/Models";
+import Performance from "./components/View/Performance";
 
 function App() {
   const [user, setUser] = useState<User | null | undefined>(undefined);
@@ -158,7 +159,7 @@ function App() {
               path: "performance",
               element: (
                 <ProtectedRoute>
-                  <Parametrization />
+                  <Performance />
                 </ProtectedRoute>
               ),
             },

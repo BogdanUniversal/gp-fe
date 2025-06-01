@@ -101,6 +101,91 @@
   color: whitesmoke;
 }
 
+.models {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1em;
+}
+.models__header {
+  font-size: 1.3em;
+  font-weight: 500;
+  color: whitesmoke;
+  margin-top: 2em;
+}
+.models__previous {
+  display: flex;
+  flex-direction: column;
+  height: 30em;
+  width: 60em;
+  overflow: auto;
+  background-color: whitesmoke;
+  border-radius: 10px;
+}
+.models__previous::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #333333;
+}
+.models__previous::-webkit-scrollbar {
+  border-radius: 10px;
+  width: 15px;
+  background-color: #4a4a4a;
+}
+.models__previous::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #4a4a4a;
+}
+.models__previous__header {
+  position: sticky;
+  top: 0;
+  background-color: #1d2229;
+  color: whitesmoke;
+  padding: 0.5em;
+  font-weight: 500;
+}
+.models__previous__models {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  height: 10em;
+}
+.models__previous__models__model {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1em;
+  border-bottom: 1px dashed grey;
+  padding: 0.5em;
+  padding-left: 1em;
+  cursor: pointer;
+}
+.models__previous__models__model.empty {
+  cursor: default;
+}
+.models__previous__models__model.empty:hover {
+  background-color: unset;
+  color: unset;
+  transition: none;
+}
+.models__previous__models__model__name {
+  overflow: hidden;
+  width: 70%;
+}
+.models__previous__models__model__date {
+  margin-left: auto;
+}
+.models__previous__models__model:hover {
+  background-color: #2e96b7;
+  color: whitesmoke;
+  transition: 0.3s all;
+}
+.models__previous__models__model.active {
+  pointer-events: none;
+  background-color: #2e96b7;
+  color: whitesmoke;
+}
+
 .view {
   overflow: hidden;
   display: flex;
@@ -251,4 +336,30 @@
 .view__tree__group__text {
   position: absolute;
   transform: translateX(1%);
+}
+.view__performance {
+  padding: 2em;
+}
+.view__performance__plots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2em;
+  width: 100%;
+}
+.view__performance__plots__title {
+  color: whitesmoke;
+  font-size: 1.5em;
+  margin-top: 2em;
+  margin-bottom: 0em;
+}
+.view__performance__plots__title:nth-of-type(1) {
+  margin-top: 0em;
+}
+.view__performance__plots__plot {
+  width: 100%;
+  border-radius: 10px;
+  background-color: #1d2229;
+  padding: 1em;
 }/*# sourceMappingURL=view.css.map */

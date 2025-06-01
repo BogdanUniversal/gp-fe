@@ -11,7 +11,7 @@ const ViewHome = () => {
     <div className="view-steps__container">
       <h1 className="view-steps__title">Model Visualization & Analysis</h1>
       <div className="view-steps">
-        <NavLink to={"/view/models"} className="view-steps__step">
+        <NavLink to={"/view/model"} className="view-steps__step">
           <div className="view-steps__step__icon">
             <TbBoxModel2 />
           </div>

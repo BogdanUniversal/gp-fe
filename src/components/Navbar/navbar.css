@@ -3,7 +3,8 @@
   flex-direction: column;
   gap: 2em;
   background-color: #323A47;
-  height: 100vh;
+  min-height: 100vh;
+  max-height: 100%;
   width: auto;
 }
 .navbar__wrapper {

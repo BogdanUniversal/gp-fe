@@ -147,7 +147,7 @@ const Data = () => {
             },
           ],
         });
-        enqueueSnackbar("Dataset selected!", {
+        enqueueSnackbar(`Dataset "${response.data.dataset.name}" selected`, {
           variant: "success",
         });
         setIsLoading(false);

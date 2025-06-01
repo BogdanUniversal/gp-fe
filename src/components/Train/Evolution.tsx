@@ -6,17 +6,16 @@ import { api } from "../../User/api";
 import { io } from "socket.io-client";
 import {
   CartesianGrid,
-  Label,
   Legend,
   Line,
   LineChart,
   ResponsiveContainer,
-  Text,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 import Loader from "../Loader/Loader";
+import { enqueueSnackbar } from "notistack";
 
 const Evolution = () => {
   const { dataset } = useContext(DatasetContext);
@@ -63,13 +62,21 @@ const Evolution = () => {
           return [...prevData, data];
         }
       });
-      if (data.generation === options.genCount) setItsTraining(false);
+      if (data.message == "complete") {
+        setItsTraining(false);
+        enqueueSnackbar("Training completed!", {
+          variant: "success",
+        });
+      }
     });
 
     await api
       .post(
         "/models/train_model",
-        { model_name: modelName, dataset_id: dataset?.id },
+        {
+          model_name: modelName.length > 0 ? modelName : "GP Model",
+          dataset_id: dataset?.id,
+        },
         { withCredentials: true }
       )
       .then((response) => {
@@ -77,6 +84,12 @@ const Evolution = () => {
       })
       .catch((error) => {
         console.error("Error during training:", error);
+        enqueueSnackbar(
+          "Error during training, parameters not correct for current dataset!",
+          {
+            variant: "error",
+          }
+        );
       });
   };
 

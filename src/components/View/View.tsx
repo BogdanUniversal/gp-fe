@@ -7,6 +7,7 @@ import { ImTree } from "react-icons/im";
 import { TbBrandPython } from "react-icons/tb";
 import { TbBoxModel2 } from "react-icons/tb";
 import { IoStatsChartSharp } from "react-icons/io5";
+import { Model, ModelContext } from "../Model/ModelContext";
 
 const DocumentationContext = createContext<DocumentationProps | undefined>(
   undefined
@@ -23,12 +24,7 @@ export const useDocumentation = (): DocumentationProps => {
 };
 
 const View = () => {
-  // const viewOptions = [
-  //   { value: "tree", label: "Tree" },
-  //   { value: "algorithm", label: "Algorithm" },
-  // ];
-  // const [view, setView] = useState({ value: "tree", label: "Tree" });
-
+  const [model, setModel] = useState<Model | null>(null);
   const [documentation, setDocumentation] = useState<DocumentationState>({
     show: false,
     text: `
@@ -132,6 +128,7 @@ def lcm(a, b):
   };
 
   return (
+    <ModelContext.Provider value={{ model, setModel }}>
     <DocumentationContext.Provider
       value={{
         documentation,
@@ -177,32 +174,6 @@ def lcm(a, b):
             {documentation.text}
           </SyntaxHighlighter>
         </div>
-        {/* <div className="view__options">
-            <div className="view__options__select">
-              View mode:
-              <Select
-                className="view__options__select__box"
-                isSearchable={false}
-                options={viewOptions}
-                value={view}
-                onChange={(option) => {
-                  setView({
-                    value: option?.value as string,
-                    label: option?.label as string,
-                  });
-                }}
-              />
-            </div>
-          </div>
-          {view.value == "tree" ? (
-            <TreeView
-              handleMouseEnter={handleMouseEnter}
-              handleMouseLeave={handleMouseLeave}
-            />
-          ) : (
-            <CodeView />
-          )} */}
-
         <div className="view__nav">
           <div className="view__nav__steps">
             <NavLink
@@ -250,6 +221,7 @@ def lcm(a, b):
         </div>
       </div>
     </DocumentationContext.Provider>
+    </ModelContext.Provider>
   );
 };
 
