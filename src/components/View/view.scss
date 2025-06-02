@@ -400,8 +400,11 @@
       }
 
       &__text {
-        position: absolute;
-        transform: translateX(1%);
+        // position: absolute;
+      }
+
+      &__return {
+        color: red;
       }
     }
   }

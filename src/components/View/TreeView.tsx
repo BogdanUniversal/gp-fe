@@ -1,55 +1,16 @@
-import Tree, { TreeNodeDatum } from "react-d3-tree";
-import { useEffect, useRef, useState, useMemo } from "react";
+import Tree, { TreeNodeDatum, RawNodeDatum } from "react-d3-tree";
+import { useEffect, useRef, useState, useMemo, useContext } from "react";
 import { MdCenterFocusWeak } from "react-icons/md";
 import { BiExpand } from "react-icons/bi";
 import { BiCollapse } from "react-icons/bi";
 import TreeViewNode from "./TreeViewNode";
 import { Tooltip } from "@mui/material";
-import { useDocumentation } from '../View/View';
+import { ModelContext } from "../Model/ModelContext";
+import { api } from "../../User/api";
 
 const TreeView = () => {
-  const { handleMouseEnter, handleMouseLeave } = useDocumentation();
-  const orgChart = {
-    name: "for",
-    children: [
-      {
-        name: "def",
-        attributes: {
-          department: "numpy",
-        },
-        children: [
-          {
-            name: "import",
-            attributes: {
-              department: "array",
-            },
-            children: [
-              {
-                name: "range",
-              },
-              {
-                name: "range",
-              },
-              {
-                name: "range",
-              },
-            ],
-          },
-          {
-            name: "from",
-            attributes: {
-              department: "numpy",
-            },
-            children: [
-              {
-                name: "zeros",
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  };
+  const { model, setModel } = useContext(ModelContext);
+  const [orgChart, setOrgChart] = useState<any>({ name: "No data", children: [] });
 
   const [collapse, setCollapse] = useState(false);
 
@@ -64,7 +25,7 @@ const TreeView = () => {
         x: dimensions.width / 2,
         y: dimensions.height / 4,
       });
-      setTriggerRecenter((prev) => prev + 1); // Force rerender
+      setTriggerRecenter((prev) => prev + 1);
     }
   };
 
@@ -72,6 +33,17 @@ const TreeView = () => {
     if (treeContainerRef.current) {
       recenterTree();
     }
+    api
+      .get("/models/get_tree", {
+        params: { model_id: model?.id },
+        withCredentials: true,
+      })
+      .then((response) => {
+        setOrgChart(response.data as RawNodeDatum);
+      })
+      .catch((error) => {
+        console.error("Error fetching tree:", error);
+      });
   }, []);
 
   const renderCustomNode = (
@@ -82,14 +54,10 @@ const TreeView = () => {
       nodeDatum: TreeNodeDatum;
       toggleNode: () => void;
     },
-    handleMouseEnter: () => void,
-    handleMouseLeave: () => void
   ) => (
     <TreeViewNode
       nodeDatum={nodeDatum}
       toggleNode={toggleNode}
-      handleMouseEnter={handleMouseEnter}
-      handleMouseLeave={handleMouseLeave}
     />
   );
 
@@ -109,12 +77,12 @@ const TreeView = () => {
             : undefined
         }
         renderCustomNodeElement={(rd3tProps) =>
-          renderCustomNode({ ...rd3tProps }, handleMouseEnter, handleMouseLeave)
+          renderCustomNode({ ...rd3tProps })
         }
         orientation="vertical"
       />
     );
-  }, [treeTranslate, triggerRecenter, collapse]);
+  }, [treeTranslate, triggerRecenter, collapse, orgChart]);
 
   return (
     <div className="view__tree" ref={treeContainerRef}>

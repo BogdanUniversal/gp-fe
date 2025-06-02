@@ -333,9 +333,8 @@
 .view__tree__group__circle1.active {
   display: block;
 }
-.view__tree__group__text {
-  position: absolute;
-  transform: translateX(1%);
+.view__tree__group__return {
+  color: red;
 }
 .view__performance {
   padding: 2em;

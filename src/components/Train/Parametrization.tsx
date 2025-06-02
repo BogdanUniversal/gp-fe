@@ -89,7 +89,7 @@ const Parametrization = () => {
       .then((response) => {
         setFunctions(response.data);
         setFixedFunctions([
-          { id: "if", name: "If Then Else", type: "Primitive" },
+          { id: "if_then_else", name: "If Then Else", type: "Primitive"},
           {
             id: "rand_gauss_0",
             name: "Random Normal (0 Mean)",
