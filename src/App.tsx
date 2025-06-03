@@ -23,10 +23,10 @@ import Loader from "./components/Loader/Loader";
 import Parametrization from "./components/Train/Parametrization";
 import Evolution from "./components/Train/Evolution";
 import TreeView from "./components/View/TreeView";
-import CodeView from "./components/View/CodeView";
 import ViewHome from "./components/View/ViewHome";
 import Models from "./components/View/Models";
 import Performance from "./components/View/Performance";
+import Predict from "./components/View/Predict";
 
 function App() {
   const [user, setUser] = useState<User | null | undefined>(undefined);
@@ -172,10 +172,10 @@ function App() {
               ),
             },
             {
-              path: "code",
+              path: "predict",
               element: (
                 <ProtectedRoute>
-                  <CodeView />
+                  <Predict />
                 </ProtectedRoute>
               ),
             },

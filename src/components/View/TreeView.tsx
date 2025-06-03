@@ -7,10 +7,15 @@ import TreeViewNode from "./TreeViewNode";
 import { Tooltip } from "@mui/material";
 import { ModelContext } from "../Model/ModelContext";
 import { api } from "../../User/api";
+import Loader from "../Loader/Loader";
 
 const TreeView = () => {
   const { model, setModel } = useContext(ModelContext);
-  const [orgChart, setOrgChart] = useState<any>({ name: "No data", children: [] });
+  const [orgChart, setOrgChart] = useState<any>({
+    name: "Select model first!",
+    children: [],
+  });
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [collapse, setCollapse] = useState(false);
 
@@ -33,6 +38,7 @@ const TreeView = () => {
     if (treeContainerRef.current) {
       recenterTree();
     }
+    setLoading(true);
     api
       .get("/models/get_tree", {
         params: { model_id: model?.id },
@@ -40,26 +46,21 @@ const TreeView = () => {
       })
       .then((response) => {
         setOrgChart(response.data as RawNodeDatum);
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching tree:", error);
+        setLoading(false);
       });
   }, []);
 
-  const renderCustomNode = (
-    {
-      nodeDatum,
-      toggleNode,
-    }: {
-      nodeDatum: TreeNodeDatum;
-      toggleNode: () => void;
-    },
-  ) => (
-    <TreeViewNode
-      nodeDatum={nodeDatum}
-      toggleNode={toggleNode}
-    />
-  );
+  const renderCustomNode = ({
+    nodeDatum,
+    toggleNode,
+  }: {
+    nodeDatum: TreeNodeDatum;
+    toggleNode: () => void;
+  }) => <TreeViewNode nodeDatum={nodeDatum} toggleNode={toggleNode} />;
 
   const TreeMemo = useMemo(() => {
     return (
@@ -68,6 +69,7 @@ const TreeView = () => {
         data={orgChart}
         translate={treeTranslate}
         initialDepth={collapse ? 0 : undefined}
+        separation={{ siblings: 2, nonSiblings: 2.5 }}
         dimensions={
           treeContainerRef.current
             ? {
@@ -130,7 +132,13 @@ const TreeView = () => {
           </div>
         </Tooltip>
       </div>
-      {TreeMemo}
+      {loading ? (
+        <div className="view__tree__loader">
+          <Loader />
+        </div>
+      ) : (
+        TreeMemo
+      )}
     </div>
   );
 };

@@ -1,10 +1,11 @@
 @import "../styles/styles.scss";
 
 .train {
+  overflow-x: hidden;
   width: 100%;
   &__steps {
     position: relative;
-    width: 90%;
+    width: auto;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -39,6 +40,25 @@
       }
     }
   }
+
+  @media screen and (max-width: 900px) {
+    &__steps {
+      height: 2.5em;
+
+      &__option {
+        width: auto;
+        padding: 0 12px;
+
+        svg {
+          font-size: 1.3em;
+        }
+      }
+
+      &__option_text {
+        display: none !important;
+      }
+    }
+  }
 }
 
 .steps {
@@ -55,6 +75,7 @@
 
   &__container {
     height: 80%;
+    max-width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -109,6 +130,36 @@
     font-size: 3em;
     color: whitesmoke;
   }
+
+  @media screen and (max-width: 1100px) {
+    flex-direction: column;
+
+    &__step {
+      width: 7em;
+      height: 12em;
+
+      &__icon {
+        width: 1.5em;
+        height: 1.5em;
+        font-size: 1.5em;
+      }
+
+      &__title {
+        font-size: 1.2em;
+      }
+
+      &__description {
+        height: 5em;
+        font-size: 0.7em;
+      }
+    }
+
+    &__forwardIcon {
+      font-size: 2em;
+      transform: rotate(90deg);
+    }
+    
+  }
 }
 
 .data {
@@ -117,6 +168,7 @@
   justify-content: center;
   align-items: center;
   gap: 1em;
+  padding: 0 1em; // Add some padding on smaller screens
 
   &__header {
     font-size: 1.3em;
@@ -129,7 +181,8 @@
     display: flex;
     flex-direction: column;
     height: 13em;
-    width: 60em;
+    width: 100%;
+    max-width: 80%;
     overflow: auto;
     background-color: whitesmoke;
     border-radius: 10px;
@@ -174,6 +227,7 @@
         padding: 0.5em;
         padding-left: 1em;
         cursor: pointer;
+        text-wrap: pretty;
 
         &.empty {
           cursor: default;
@@ -216,11 +270,12 @@
     align-items: center;
     justify-content: center;
     gap: 1em;
-    width: 30em;
+    width: 100%;
     height: 13em;
     text-align: center;
     border: 2px dashed grey;
     border-radius: 10px;
+    padding: 0.5em;
 
     &__container {
       display: flex;
@@ -229,7 +284,8 @@
       justify-content: center;
       padding: 1em;
       background-color: whitesmoke;
-      width: 30em;
+      width: 100%;
+      max-width: 70%;
       height: 13em;
       border-radius: 10px;
 
@@ -363,6 +419,7 @@
     grid-template-columns: 1fr 1fr;
     padding: 0 0.5em 0 0.5em;
     column-gap: 0.5em;
+    
 
     & > * {
       height: 0.5em;
@@ -383,8 +440,29 @@
       height: 4em;
     }
   }
-}
 
+  @media screen and (max-width: 1200px) {
+    flex-direction: column;
+    height: auto;
+    width: 100%;
+
+    &__table {
+      width: 100%;
+    }
+
+    &__options {
+      padding-top: 2em;
+      padding-bottom: 2em;
+      display: flex;
+      flex-direction: column;
+            & > * {
+      height: 5em;
+    }
+    }
+
+    
+  }
+}
 
 .evolution {
   display: flex;

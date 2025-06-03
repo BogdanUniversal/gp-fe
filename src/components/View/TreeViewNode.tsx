@@ -26,9 +26,13 @@ const TreeViewNode = ({
   const tooltipMinWidth = 300;
   const tooltipHeight = Math.min(200, docText.split("\n").length * 20 + 40);
 
+  const truncateText = (text: string, maxLength = 30) => {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength) + "...";
+  };
+
   useEffect(() => {
     if (isNodeHovered || isTooltipHovered) {
-      // Clear any pending close timeout
       if (closeTimeoutRef.current) {
         clearTimeout(closeTimeoutRef.current);
         closeTimeoutRef.current = null;
@@ -98,7 +102,7 @@ const TreeViewNode = ({
               fontWeight: "bold",
             }}
           >
-            {nodeDatum.name}
+            {nodeDatum.name.includes("IN") ? nodeDatum.name.slice(3) : nodeDatum.name}
             {nodeDatum.attributes?.type && (
               <span style={{ color: "#999", marginLeft: "8px" }}>
                 ({nodeDatum.attributes.type})
@@ -153,7 +157,7 @@ const TreeViewNode = ({
           x="20"
           style={{ pointerEvents: "none" }}
         >
-          {nodeDatum.name}
+          {truncateText(nodeDatum.name.includes("IN") ? nodeDatum.name.slice(3) : nodeDatum.name, 25)}
         </text>
         <text x="20" y="20" className="view__tree__group__return">
           {nodeDatum.attributes?.returnType

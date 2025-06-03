@@ -1,10 +1,10 @@
-import "./view.css"
+import "./view.css";
 import { IoStatsChartSharp } from "react-icons/io5";
 import { MdArrowForward } from "react-icons/md";
 import { NavLink } from "react-router-dom";
 import { ImTree } from "react-icons/im";
-import { TbBrandPython } from "react-icons/tb";
 import { TbBoxModel2 } from "react-icons/tb";
+import { MdBatchPrediction } from "react-icons/md";
 
 const ViewHome = () => {
   return (
@@ -56,14 +56,13 @@ const ViewHome = () => {
           <MdArrowForward />
         </div>
 
-        <NavLink to={"/view/code"} className="view-steps__step">
+        <NavLink to={"/view/predict"} className="view-steps__step">
           <div className="view-steps__step__icon">
-            <TbBrandPython />
+            <MdBatchPrediction />
           </div>
-          <div className="view-steps__step__title">Code View & Prediction</div>
+          <div className="view-steps__step__title">Prediction</div>
           <div className="view-steps__step__description">
-            Examine the generated code implementation of your model and test it
-            with new inputs to make real-time predictions.
+            Test your model with new inputs to make real-time predictions.
           </div>
         </NavLink>
       </div>

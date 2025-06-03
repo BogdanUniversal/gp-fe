@@ -49,7 +49,7 @@ const Train = () => {
               }}
               to={"/train/data"}
             >
-              <BsDatabase /> Data
+              <BsDatabase /> <div className="train__steps__option_text">Data</div>
             </NavLink>
             <NavLink
               className={({ isActive }) => {
@@ -59,7 +59,7 @@ const Train = () => {
               }}
               to={"/train/parametrization"}
             >
-              <IoOptionsOutline /> Parametrization
+              <IoOptionsOutline /> <div className="train__steps__option_text">Parametrization</div>
             </NavLink>
             <NavLink
               className={({ isActive }) => {
@@ -69,7 +69,7 @@ const Train = () => {
               }}
               to={"/train/train"}
             >
-              <MdModelTraining /> Train
+              <MdModelTraining /> <div className="train__steps__option_text">Train</div>
             </NavLink>
           </div>
           <Outlet />

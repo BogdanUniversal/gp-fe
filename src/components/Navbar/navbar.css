@@ -67,4 +67,19 @@
   background-color: #949494;
   opacity: 1;
   color: #e5e5e5;
+}
+@media screen and (max-width: 768px) {
+  .navbar .navbar {
+    width: 60px;
+  }
+  .navbar .navbar__text {
+    display: none;
+  }
+  .navbar .navbar__link__icon {
+    display: none;
+  }
+  .navbar .navbar__header > div {
+    justify-content: center;
+    align-items: center;
+  }
 }/*# sourceMappingURL=navbar.css.map */

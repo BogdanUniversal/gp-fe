@@ -1,80 +1,98 @@
 @import "../styles/styles.scss";
 
 .navbar {
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+  background-color: $secondary;
+  min-height: 100vh;
+  max-height: 100%;
+  width: auto;
+
+  &__wrapper {
     display: flex;
-    flex-direction: column;
-    gap: 2em;
-    background-color: $secondary;
-    min-height: 100vh;
-    max-height: 100%;
-    width: auto;
+    flex-direction: row;
+  }
 
-    &__wrapper {
-        display: flex;
-        flex-direction: row;
+  &__header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    color: $text;
+    border-bottom: solid 1px grey;
+    user-select: none;
+    height: 3em;
+
+    & > div {
+      display: flex;
+      flex-direction: row;
+      gap: 0.2em;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3em;
+    }
+  }
+
+  &__link {
+    padding-left: 0.5em;
+    padding-right: 2em;
+    padding: 0.3em 0.5em 0.5em 0.3em;
+    text-decoration: none;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.2em;
+    font-size: 1em;
+    opacity: 0.6;
+    white-space: nowrap;
+    color: $text;
+    border-radius: 10px;
+
+    &__icon {
+      margin-left: auto;
+      padding-left: 1em;
     }
 
-    &__header {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
+    &:nth-of-type(1) {
+      margin-top: 3em;
+    }
+
+    &:last-of-type {
+      margin-top: auto;
+      margin-bottom: 1em;
+    }
+
+    &:hover {
+      transition: 0.3s all;
+      opacity: 1;
+      background-color: $fourtary;
+      color: $text;
+    }
+
+    &.active {
+      background-color: $fourtary;
+      opacity: 1;
+      color: $text;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .navbar {
+      width: 60px;
+
+      &__text {
+        display: none;
+      }
+
+      &__link__icon {
+        display: none;
+      }
+
+      &__header > div {
         justify-content: center;
-        color: $text;
-        border-bottom: solid 1px grey;
-        user-select: none;
-        height: 3em;
-
-        &>div {
-        display: flex;
-        flex-direction: row;
-        gap: 0.2em;
         align-items: center;
-        justify-content: center;
-        font-size: 1.3em;
-        }
+      }
     }
-
-
-    &__link {
-        padding-left: 0.5em;
-        padding-right: 2em;
-        padding: 0.3em 0.5em 0.5em 0.3em;
-        text-decoration: none;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 0.2em;
-        font-size: 1em;
-        opacity: 0.6;
-        white-space: nowrap;
-        color: $text;
-        border-radius: 10px;
-
-        &__icon {
-            margin-left: auto;
-            padding-left: 1em;
-        }
-
-        &:nth-of-type(1) {
-            margin-top: 3em;
-        }
-
-        &:last-of-type {
-            margin-top: auto;
-            margin-bottom: 1em;
-        }
-
-        &:hover {
-            transition: 0.3s all;
-            opacity: 1;
-            background-color: $fourtary;
-            color: $text;
-        }
-
-        &.active {
-            background-color: $fourtary;
-            opacity: 1;
-            color: $text;
-        }
-    }
+  }
 }

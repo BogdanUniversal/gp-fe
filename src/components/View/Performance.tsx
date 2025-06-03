@@ -75,8 +75,10 @@ const Performance = () => {
   const [performanceData, setPerformanceData] =
     useState<PerformanceData | null>(null);
   const { model } = useContext(ModelContext);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    setLoading(true);
     api
       .get("/models/get_performance", {
         params: { model_id: model?.id },
@@ -84,9 +86,11 @@ const Performance = () => {
       })
       .then((response) => {
         setPerformanceData(response.data);
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching performance data:", error);
+        setLoading(false);
       });
   }, [model]);
 
@@ -101,14 +105,14 @@ const Performance = () => {
               ? performanceData?.fig_performance
               : ""
           }
-        /> : <Loader />}
+        /> : loading ? <Loader /> : <p>Select model before viewing performance.</p>}
         <h3 className="view__performance__plots__title">Profile</h3>
         {performanceData?.fig_profile ? <PlotContainer
         className="view__performance__plots__plot"
           htmlContent={
             performanceData?.fig_profile ? performanceData?.fig_profile : ""
           }
-        />  : <Loader />}
+        />  : loading ? <Loader /> : <p>Select model before viewing performance.</p>}
         <h3 className="view__performance__plots__title">Single Explanation</h3>
         {performanceData?.fig_single_explanation ? <PlotContainer
         className="view__performance__plots__plot"
@@ -117,7 +121,7 @@ const Performance = () => {
               ? performanceData?.fig_single_explanation
               : ""
           }
-        /> : <Loader />}
+        /> : loading ? <Loader /> : <p>Select model before viewing performance.</p>}
       </div>
     </div>
   );

@@ -2,10 +2,10 @@ import "./view.css";
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { ImTree } from "react-icons/im";
-import { TbBrandPython } from "react-icons/tb";
 import { TbBoxModel2 } from "react-icons/tb";
 import { IoStatsChartSharp } from "react-icons/io5";
 import { Model, ModelContext } from "../Model/ModelContext";
+import { MdBatchPrediction } from "react-icons/md";
 
 const View = () => {
   const [model, setModel] = useState<Model | null>(null);
@@ -51,9 +51,9 @@ const View = () => {
                   ? "view__nav__steps__option active"
                   : "view__nav__steps__option";
               }}
-              to={"/view/code"}
+              to={"/view/predict"}
             >
-              <TbBrandPython /> Code
+              <MdBatchPrediction /> Predict
             </NavLink>
           </div>
           <Outlet />
