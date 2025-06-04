@@ -27,6 +27,7 @@ import ViewHome from "./components/View/ViewHome";
 import Models from "./components/View/Models";
 import Performance from "./components/View/Performance";
 import Predict from "./components/View/Predict";
+import About from "./components/About/About";
 
 function App() {
   const [user, setUser] = useState<User | null | undefined>(undefined);
@@ -38,7 +39,7 @@ function App() {
           withCredentials: true,
         });
         console.log("Test response:", response.data);
-        setUser({ name: response.data.user }); // Set user if authenticated
+        setUser({ name: response.data.user });
       } catch (error) {
         console.log("Test failed:", error);
         setUser(null);
@@ -70,7 +71,7 @@ function App() {
     checkAuth();
 
     if (user === undefined) {
-      return <Loader />; // Render loader while waiting for the authentication check
+      return <Loader />;
     }
 
     if (!user) {
@@ -180,6 +181,10 @@ function App() {
               ),
             },
           ],
+        },
+        {
+          path: "/about",
+          element: <About />,
         },
         {
           path: "/signup",

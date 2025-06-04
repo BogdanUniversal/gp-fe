@@ -36,6 +36,21 @@
   background-color: #949494;
   color: #e5e5e5;
 }
+@media screen and (max-width: 1050px) {
+  .view__nav__steps {
+    height: 2.5em;
+  }
+  .view__nav__steps__option {
+    width: auto;
+    padding: 0 12px;
+  }
+  .view__nav__steps__option svg {
+    font-size: 1.3em;
+  }
+  .view__nav__steps__text {
+    display: none !important;
+  }
+}
 
 .view-steps {
   display: flex;
@@ -100,12 +115,18 @@
   font-size: 3em;
   color: whitesmoke;
 }
-@media screen and (max-width: 1300px) {
+@media screen and (max-width: 1400px) {
   .view-steps {
     flex-direction: column;
   }
+  .view-steps__container {
+    height: 100%;
+  }
+  .view-steps__title {
+    font-size: 1.5em;
+  }
   .view-steps__step {
-    width: 7em;
+    width: 8em;
     height: 12em;
   }
   .view-steps__step__icon {
@@ -123,6 +144,9 @@
   .view-steps__forwardIcon {
     font-size: 2em;
     transform: rotate(90deg);
+  }
+  .view-steps:last-child {
+    margin-bottom: 3em;
   }
 }
 
@@ -143,10 +167,11 @@
   display: flex;
   flex-direction: column;
   height: 30em;
-  width: 60em;
   overflow: auto;
   background-color: whitesmoke;
   border-radius: 10px;
+  width: 100%;
+  max-width: 80%;
 }
 .models__previous::-webkit-scrollbar-track {
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
@@ -242,7 +267,7 @@
 }
 @media screen and (max-width: 768px) {
   .view__predict {
-    width: 90%;
+    width: 70%;
     grid-template-columns: 1fr;
   }
 }

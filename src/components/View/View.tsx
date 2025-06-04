@@ -23,7 +23,7 @@ const View = () => {
               }}
               to={"/view/model"}
             >
-              <TbBoxModel2 /> Model
+              <TbBoxModel2 /> <div className="view__nav__steps__text">Model</div>
             </NavLink>
             <NavLink
               className={({ isActive }) => {
@@ -33,7 +33,7 @@ const View = () => {
               }}
               to={"/view/performance"}
             >
-              <IoStatsChartSharp /> Performance
+              <IoStatsChartSharp /> <div className="view__nav__steps__text">Performance</div>
             </NavLink>
             <NavLink
               className={({ isActive }) => {
@@ -43,7 +43,7 @@ const View = () => {
               }}
               to={"/view/tree"}
             >
-              <ImTree /> Tree
+              <ImTree /> <div className="view__nav__steps__text">Tree</div>
             </NavLink>
             <NavLink
               className={({ isActive }) => {
@@ -53,7 +53,7 @@ const View = () => {
               }}
               to={"/view/predict"}
             >
-              <MdBatchPrediction /> Predict
+              <MdBatchPrediction /> <div className="view__nav__steps__text">Predict</div>
             </NavLink>
           </div>
           <Outlet />

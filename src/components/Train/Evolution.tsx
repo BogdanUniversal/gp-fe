@@ -1,9 +1,9 @@
 import { Button, TextField } from "@mui/material";
-import { SetStateAction, useContext, useEffect, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { DatasetContext } from "../../Data/dataContext";
 import { OptionsContext } from "../Options/optionsContext";
 import { api } from "../../User/api";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import {
   CartesianGrid,
   Legend,
@@ -24,8 +24,19 @@ const Evolution = () => {
   const [trainData, setTrainData] = useState<any[]>([]);
   const [preprocessing, setPreprocessing] = useState<boolean>(false);
   const [itsTraining, setItsTraining] = useState<boolean>(false);
+  const TRAINING_COMPLETE_KEY = "training-complete-notification";
+
+  const socketRef = useRef<Socket | null>(null);
+
+  const cleanupSocket = () => {
+    if (socketRef.current) {
+      socketRef.current.disconnect();
+      socketRef.current = null;
+    }
+  };
 
   const handleTrainModel = async () => {
+    cleanupSocket();
     setTrainData([]);
     setItsTraining(true);
     setPreprocessing(true);
@@ -35,7 +46,7 @@ const Evolution = () => {
 
     const csrf_token = csrf_cookie?.split("=")[1] || "";
 
-    const socket = io("http://localhost:5000/train/train", {
+    socketRef.current = io("http://localhost:5000/train/train", {
       transports: ["websocket"],
       withCredentials: true,
       extraHeaders: {
@@ -43,11 +54,11 @@ const Evolution = () => {
       },
     });
 
-    socket.on("connect", () => {
+    socketRef.current.on("connect", () => {
       setTrainData([]);
     });
 
-    socket.on("training_update", (data) => {
+    socketRef.current.on("training_update", (data) => {
       setPreprocessing(false);
       setTrainData((prevData) => {
         const generationExists = prevData.some(
@@ -64,8 +75,10 @@ const Evolution = () => {
       });
       if (data.message == "complete") {
         setItsTraining(false);
+        console.log("Training completed:", data);
         enqueueSnackbar("Training completed!", {
           variant: "success",
+          autoHideDuration: 20000,
         });
       }
     });
@@ -84,12 +97,22 @@ const Evolution = () => {
       })
       .catch((error) => {
         console.error("Error during training:", error);
-        enqueueSnackbar(
-          "Error during training, parameters not correct for current dataset!",
-          {
+        if (error.response && error.response.status === 410) {
+          enqueueSnackbar(error.response.data.error, {
             variant: "error",
-          }
-        );
+            autoHideDuration: 7000,
+          });
+        } else
+          enqueueSnackbar(
+            "Error during training, parameters not correct for current dataset!",
+            {
+              variant: "error",
+              autoHideDuration: 5000,
+            }
+          );
+        setPreprocessing(false);
+        setItsTraining(false);
+        cleanupSocket();
       });
   };
 

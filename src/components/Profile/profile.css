@@ -62,4 +62,20 @@
   opacity: 1;
   background-color: #949494;
   color: #e5e5e5;
+}
+@media screen and (max-width: 1050px) {
+  .profile__main {
+    padding: 0.5em;
+    height: 1.3em;
+  }
+  .profile__main__icon {
+    margin-right: 0.1em;
+  }
+  .profile__options {
+    position: absolute;
+    top: 3em;
+    right: 0;
+    width: 100%;
+    padding-top: 0.5em;
+  }
 }/*# sourceMappingURL=profile.css.map */

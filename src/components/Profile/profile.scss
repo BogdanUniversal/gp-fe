@@ -3,7 +3,6 @@
 .profile {
     position: absolute;
     z-index: 100;
-    // top: 1em;
     right: 0em;
 
     &:hover {
@@ -75,5 +74,25 @@
                 color: $text;
             }
         }
+    }
+
+    @media screen and (max-width: 1050px) {
+        &__main {
+            padding: 0.5em;
+            height: 1.3em;
+
+            &__icon {
+                margin-right: 0.1em;
+            }
+        }
+
+        &__options {
+            position: absolute;
+            top: 3em;
+            right: 0;
+            width: 100%;
+            padding-top: 0.5em;
+        }
+        
     }
 }

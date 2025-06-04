@@ -8,7 +8,7 @@ import { enqueueSnackbar } from "notistack";
 import { OptionsContext } from "../Options/optionsContext";
 
 const Parametrization = () => {
-  const { dataset, setDataset } = useContext(DatasetContext);
+  const { dataset } = useContext(DatasetContext);
   const { options, setOptions } = useContext(OptionsContext);
   const [columns, setColumns] = useState<GridColDef[]>([]);
   const [rows, setRows] = useState<any[]>([]);

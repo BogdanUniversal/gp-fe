@@ -4,7 +4,7 @@ import { BsDatabase } from "react-icons/bs";
 import { IoOptionsOutline } from "react-icons/io5";
 import { MdModelTraining } from "react-icons/md";
 import { Dataset, DatasetContext } from "../../Data/dataContext";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Options, OptionsContext } from "../Options/optionsContext";
 
 const Train = () => {

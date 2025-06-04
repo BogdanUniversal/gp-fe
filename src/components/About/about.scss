@@ -1,0 +1,36 @@
+.about {
+    margin: auto;
+    background-color: whitesmoke;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2em;
+    border-radius: 10px;
+    height: 40em;
+    width: 50%;
+
+    &__title {
+        font-size: 2em;
+        font-weight: bold;
+        margin-bottom: 2em;
+    }
+
+    &__paragraph {
+        font-size: 1.2em;
+        text-align: center;
+        margin: 0 2em;
+
+        &__sub {
+            font-weight: bold;
+        }
+
+        &.last {
+            margin-top: 2em;
+            display: flex;
+            gap: 2em;
+            flex-direction: row;
+            align-items: center;
+        }
+    }
+}

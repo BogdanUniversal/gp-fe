@@ -6,12 +6,8 @@ import { MdModelTraining, MdOutlineInfo } from "react-icons/md";
 import { GrView } from "react-icons/gr";
 import { IoIosArrowForward } from "react-icons/io";
 import Profile from "../Profile/Profile";
-import { useState } from "react";
-import { FiMenu, FiX } from "react-icons/fi";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(true);
-
   return (
     <div className="navbar__wrapper">
       <Profile />

@@ -6,6 +6,7 @@ import { enqueueSnackbar } from "notistack";
 import { ModelContext } from "../Model/ModelContext";
 import { TbBoxModel2 } from "react-icons/tb";
 import "./view.css"
+import { useNavigate } from "react-router-dom";
 
 const Models = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -18,6 +19,7 @@ const Models = () => {
     }[]
   >([]);
   const { model, setModel } = useContext(ModelContext);
+  const navigate = useNavigate();
 
   const handleGetModels = async () => {
     try {
@@ -81,6 +83,7 @@ const Models = () => {
                 }
                 onClick={() => {
                   setModel(md)
+                  navigate("/view/performance");
                   enqueueSnackbar(
                     `Model "${md.model_name}" selected`,
                     { variant: "success"})

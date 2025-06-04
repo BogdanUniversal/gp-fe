@@ -14,7 +14,7 @@ const Steps = () => {
           <div className="steps__step__icon">
             <BsDatabase />
           </div>
-          <div className="steps__step__title">Step 1</div>
+          <div className="steps__step__title">Choose data</div>
           <div className="steps__step__description">
             Upload new datasets, access previous uploaded dataset and visualize
             the dataset you wish to experiment with.
@@ -27,7 +27,7 @@ const Steps = () => {
           <div className="steps__step__icon">
             <IoOptionsOutline />
           </div>
-          <div className="steps__step__title">Step 2</div>
+          <div className="steps__step__title">Select parameters</div>
           <div className="steps__step__description">
             Choose different tehniques for processing the data and different
             parameters for how the model is trained.
@@ -40,7 +40,7 @@ const Steps = () => {
           <div className="steps__step__icon">
             <MdModelTraining />
           </div>
-          <div className="steps__step__title">Step 3</div>
+          <div className="steps__step__title">Train</div>
           <div className="steps__step__description">
             See in real time how the model is trained and its performance over
             time.

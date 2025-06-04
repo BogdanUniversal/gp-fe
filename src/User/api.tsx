@@ -9,9 +9,9 @@ export const api = axios.create({
 });
 
 
-// Add an interceptor to fetch CSRF token before POST requests
+// interceptor to fetch CSRF token before POST requests
 api.interceptors.request.use(async (config) => {
-  // Only fetch CSRF token for POST/PUT/DELETE/PATCH requests
+  // fetch CSRF token for POST/PUT/DELETE/PATCH requests
   if (config.method && ['post', 'put', 'delete', 'patch'].includes(config.method)) {
       try {
           const csrf_cookie = document.cookie
